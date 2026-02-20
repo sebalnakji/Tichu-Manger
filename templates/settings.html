@@ -1,0 +1,544 @@
+{% extends "base.html" %}
+
+{% block title %}설정 - Tichu Manager{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --bg-main: #F9FAFB;
+        --bg-card: #FFFFFF;
+        --bg-card-sub: #F3F4F6;
+        --border: rgba(0,0,0,0.07);
+        --text-primary: #1F2937;
+        --text-secondary: #6B7280;
+        --text-muted: #9CA3AF;
+        --accent: #10B981;
+        --divider: rgba(0,0,0,0.06);
+        --header-bg: rgba(255,255,255,0.95);
+        --input-text: #1F2937;
+        --error-bg: #FEF2F2;
+        --error-text: #EF4444;
+        --toggle-label: #1F2937;
+        --toggle-sub: #9CA3AF;
+        --toggle-card-bg: #FFFFFF;
+        --admin-icon-bg: #111827;
+        --tab-bg: #F3F4F6;
+        --tab-active-bg: #FFFFFF;
+        --tab-active-text: #1F2937;
+        --tab-inactive-text: #9CA3AF;
+        --user-badge-bg: #ECFDF5;
+        --user-badge-text: #059669;
+    }
+
+    [data-theme="dark"] {
+        --bg-main: #0F0F1A;
+        --bg-card: #1A1A2E;
+        --bg-card-sub: #0F0F1A;
+        --border: rgba(255,255,255,0.08);
+        --text-primary: #F9FAFB;
+        --text-secondary: #9CA3AF;
+        --text-muted: #6B7280;
+        --accent: #10B981;
+        --divider: rgba(255,255,255,0.05);
+        --header-bg: rgba(26,26,46,0.95);
+        --input-text: #F9FAFB;
+        --error-bg: rgba(239,68,68,0.1);
+        --error-text: #FCA5A5;
+        --toggle-label: #F9FAFB;
+        --toggle-sub: #6B7280;
+        --toggle-card-bg: #1A1A2E;
+        --admin-icon-bg: #1A1A2E;
+        --tab-bg: #0F0F1A;
+        --tab-active-bg: #1A1A2E;
+        --tab-active-text: #F9FAFB;
+        --tab-inactive-text: #6B7280;
+        --user-badge-bg: rgba(16,185,129,0.15);
+        --user-badge-text: #34D399;
+    }
+
+    .s-bg { background-color: var(--bg-main); }
+    .s-header { background-color: var(--header-bg); border-bottom: 1px solid var(--border); }
+    .s-back { color: var(--text-secondary); }
+    .s-back:hover { background-color: var(--bg-card-sub); }
+    .s-title { color: var(--text-primary); }
+    .s-card { background-color: var(--bg-card); border: 1px solid var(--border); }
+    .s-card-sub { background-color: var(--bg-card-sub); }
+    .s-text-primary { color: var(--text-primary); }
+    .s-text-secondary { color: var(--text-secondary); }
+    .s-text-muted { color: var(--text-muted); }
+    .s-input { color: var(--input-text); background: transparent; }
+    .s-error { background-color: var(--error-bg); color: var(--error-text); }
+    .s-toggle-label { color: var(--toggle-label); }
+    .s-toggle-sub { color: var(--toggle-sub); }
+    .s-toggle-card { background-color: var(--toggle-card-bg); border: 1px solid var(--border); }
+    .s-admin-icon { background-color: var(--admin-icon-bg); }
+    .s-tab-bar { background-color: var(--tab-bg); }
+    .s-tab-active { background-color: var(--tab-active-bg); color: var(--tab-active-text); }
+    .s-tab-inactive { color: var(--tab-inactive-text); }
+    .s-user-badge { background-color: var(--user-badge-bg); color: var(--user-badge-text); }
+    .s-section-label { color: var(--text-muted); }
+    .s-user-row { background-color: var(--bg-card); border: 1px solid var(--border); }
+    .s-user-name { color: var(--text-primary); }
+    .s-user-code { color: var(--text-muted); }
+    .s-version { color: var(--text-muted); }
+</style>
+
+<div class="s-bg min-h-screen pb-20">
+    <div class="max-w-md mx-auto relative">
+
+        <div class="sticky top-0 z-40 s-header backdrop-blur-md px-4 py-3 flex items-center justify-between shadow-sm">
+            <a href="/" class="w-10 h-10 flex items-center justify-center rounded-full transition active:scale-95 s-back">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </a>
+            <h2 class="text-lg font-black tracking-tight s-title">설정</h2>
+            <div class="w-10"></div>
+        </div>
+
+        <div class="px-5 pt-6">
+
+            <div id="auth-required-section" class="s-card rounded-3xl shadow-lg p-8 text-center mt-10">
+                <div class="text-6xl mb-4 animate-bounce">🔒</div>
+                <h3 class="text-xl font-black mb-2 s-text-primary">로그인이 필요해요</h3>
+                <p class="text-sm mb-8 leading-relaxed s-text-secondary">
+                    본인 확인을 위해<br>발급받은 코드를 입력해주세요.
+                </p>
+
+                <!-- 다크모드 토글 -->
+                <div class="s-toggle-card rounded-2xl shadow-sm p-4 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-bold s-toggle-label">다크 모드</p>
+                        <p class="text-xs mt-0.5 s-toggle-sub">어두운 테마로 전환합니다</p>
+                    </div>
+                    <button class="theme-toggle-btn relative w-14 h-7 rounded-full transition-colors duration-300 focus:outline-none" onclick="toggleTheme()" class="relative w-14 h-7 rounded-full transition-colors duration-300 focus:outline-none" aria-label="테마 전환">
+                        <div class="theme-toggle-track w-full h-full rounded-full transition-colors duration-300 bg-gray-200" class="w-full h-full rounded-full transition-colors duration-300 bg-gray-200"></div>
+                        <div class="theme-toggle-thumb absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow-md transition-transform duration-300" class="absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow-md transition-transform duration-300"></div>
+                    </button>
+                </div>
+                <button
+                    onclick="requestAuth()"
+                    class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-2xl shadow-lg transition transform active:scale-95"
+                >
+                    코드 입력하기
+                </button>
+            </div>
+
+            <div id="user-settings-section" class="hidden">
+                <div class="flex flex-col items-center mb-8">
+                    <div class="relative group">
+                        <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-lg mb-4 bg-gray-100">
+                            <img id="user-profile-img" src="https://via.placeholder.com/80" alt="프로필" class="w-full h-full object-cover" style="object-fit: cover; object-position: center;">
+                        </div>
+                        <button onclick="showProfileImageMenu()" class="absolute bottom-4 right-0 bg-gray-900 text-white p-1.5 rounded-full shadow-md hover:bg-black transition active:scale-95">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <p id="user-profile-name" class="text-2xl font-black mb-1 s-text-primary"></p>
+                    <span class="text-xs font-bold px-2 py-1 rounded-md s-user-badge">User</span>
+                </div>
+
+                <input type="file" id="profile-image-input" accept="image/jpeg,image/jpg,image/png,image/webp" class="hidden" onchange="handleImageSelect(event)">
+
+                <div class="space-y-4 mb-8">
+                    <div class="s-card p-4 rounded-2xl shadow-sm">
+                        <label class="block text-xs font-bold mb-1 uppercase tracking-wider s-text-muted">닉네임</label>
+                        <input
+                            type="text"
+                            id="edit-name"
+                            class="w-full text-lg font-bold bg-transparent border-none focus:ring-0 p-0 placeholder-gray-300 s-input"
+                            placeholder="이름을 입력하세요"
+                            maxlength="50"
+                        >
+                    </div>
+
+                    <div class="s-card p-4 rounded-2xl shadow-sm">
+                        <label class="block text-xs font-bold mb-1 uppercase tracking-wider s-text-muted">접속 코드</label>
+                        <div class="flex items-center">
+                            <input
+                                type="password"
+                                id="edit-code"
+                                class="w-full text-lg font-bold bg-transparent border-none focus:ring-0 p-0 placeholder-gray-300 s-input"
+                                placeholder="코드를 입력하세요"
+                                maxlength="50"
+                            >
+                            <button type="button" onclick="toggleCodeVisibility()" class="p-2 s-text-muted">👁️</button>
+                        </div>
+                    </div>
+                    <p class="text-[10px] pl-2 s-text-muted">⚠️ 코드는 띄어쓰기 없이 입력해주세요.</p>
+                </div>
+
+                <div id="edit-error-message" class="hidden s-error px-4 py-3 rounded-xl mb-6 text-sm font-bold text-center"></div>
+
+                <div class="space-y-3">
+
+                <!-- 다크모드 토글 -->
+                <div class="s-toggle-card rounded-2xl shadow-sm p-4 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-bold s-toggle-label">다크 모드</p>
+                        <p class="text-xs mt-0.5 s-toggle-sub">어두운 테마로 전환합니다</p>
+                    </div>
+                    <button class="theme-toggle-btn relative w-14 h-7 rounded-full transition-colors duration-300 focus:outline-none" onclick="toggleTheme()" aria-label="테마 전환">
+                        <div class="theme-toggle-track w-full h-full rounded-full transition-colors duration-300 bg-gray-200"></div>
+                        <div class="theme-toggle-thumb absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow-md transition-transform duration-300"></div>
+                    </button>
+                </div>
+                    <button onclick="saveProfile()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-2xl transition active:scale-[0.98]">저장하기</button>
+                    <button onclick="logout()" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-600 font-bold py-4 rounded-2xl transition active:scale-[0.98]">로그아웃</button>
+                </div>
+            </div>
+
+            <div id="admin-settings-section" class="hidden">
+                <div class="flex flex-col items-center mb-6">
+                    <div class="w-20 h-20 rounded-full flex items-center justify-center mb-3 shadow-lg s-admin-icon">
+                        <span class="text-3xl">🛠️</span>
+                    </div>
+                    <h3 class="text-xl font-black s-text-primary">관리자 모드</h3>
+                </div>
+
+                <div class="s-tab-bar p-1 rounded-xl flex mb-6">
+                    <button id="tab-users" onclick="switchAdminTab('users')" class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all shadow-sm bg-white text-gray-800">유저 관리</button>
+                    <button id="tab-data" onclick="switchAdminTab('data')" class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all text-gray-400 hover:text-gray-600">데이터 관리</button>
+                </div>
+
+                <div id="admin-users-tab" class="space-y-3 pb-20">
+                    <h3 class="text-xs font-bold uppercase mb-2 px-1 s-section-label">등록된 유저</h3>
+                    <div id="admin-users-list" class="space-y-3"></div>
+                </div>
+
+                <div id="admin-data-tab" class="hidden space-y-3 pb-20">
+                    <h3 class="text-xs font-bold uppercase mb-2 px-1 s-section-label">시스템 관리</h3>
+                    <button class="w-full flex items-center justify-between p-5 s-card rounded-2xl shadow-sm transition active:scale-95" style="hover:background-color:var(--bg-card-sub)">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background-color:var(--bg-card-sub)">✏️</div>
+                            <span class="font-bold s-text-primary">잘못된 기록 수정</span>
+                        </div>
+                        <span class="s-text-muted">→</span>
+                    </button>
+                    <button onclick="confirmResetAll()" class="w-full flex items-center justify-between p-5 bg-white border border-red-100 rounded-2xl shadow-sm hover:bg-red-50 transition active:scale-95 group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-red-500 group-hover:bg-red-100">🗑️</div>
+                            <span class="font-bold text-red-500">데이터 전체 초기화</span>
+                        </div>
+                        <span class="text-red-300 group-hover:text-red-500">→</span>
+                    </button>
+                </div>
+
+
+                <!-- 다크모드 토글 -->
+                <div class="s-toggle-card rounded-2xl shadow-sm p-4 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-bold s-toggle-label">다크 모드</p>
+                        <p class="text-xs mt-0.5 s-toggle-sub">어두운 테마로 전환합니다</p>
+                    </div>
+                    <button class="theme-toggle-btn relative w-14 h-7 rounded-full transition-colors duration-300 focus:outline-none" onclick="toggleTheme()" class="relative w-14 h-7 rounded-full transition-colors duration-300 focus:outline-none" aria-label="테마 전환">
+                        <div class="theme-toggle-track w-full h-full rounded-full transition-colors duration-300 bg-gray-200" class="w-full h-full rounded-full transition-colors duration-300 bg-gray-200"></div>
+                        <div class="theme-toggle-thumb absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow-md transition-transform duration-300" class="absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow-md transition-transform duration-300"></div>
+                    </button>
+                </div>
+                <button onclick="logout()" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-600 font-bold py-4 rounded-2xl transition active:scale-[0.98] mt-4">관리자 로그아웃</button>
+            </div>
+
+            <div class="text-center mt-8 pb-8">
+                <p class="text-[10px] font-bold uppercase tracking-widest s-version">Tichu Manager v1.0.0</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 프로필 이미지 선택 메뉴 모달 -->
+<div id="profile-menu-modal" class="hidden fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm" onclick="closeProfileImageMenu()">
+    <div class="bg-white rounded-t-3xl w-full max-w-md shadow-2xl animate-slide-up" onclick="event.stopPropagation()">
+        <div class="p-6 space-y-3">
+            <button onclick="openFileSelector()" class="w-full flex items-center justify-center gap-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-2xl transition active:scale-95">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span>사진 변경</span>
+            </button>
+            <button onclick="resetToDefaultImage()" class="w-full flex items-center justify-center gap-3 bg-gray-500 hover:bg-gray-600 text-white font-bold py-4 rounded-2xl transition active:scale-95">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span>기본 이미지로</span>
+            </button>
+            <button onclick="closeProfileImageMenu()" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-4 rounded-2xl transition active:scale-95">취소</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes slide-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .animate-slide-up { animation: slide-up 0.3s ease-out; }
+</style>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    let currentPlayerId = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        checkAuthAndLoadSettings();
+        initThemeToggle();
+
+        const codeInput = document.getElementById('edit-code');
+        if (codeInput) AuthManager.preventSpace(codeInput);
+    });
+
+    // ── 프로필 이미지 ─────────────────────────────────
+    function showProfileImageMenu() { document.getElementById('profile-menu-modal').classList.remove('hidden'); }
+    function closeProfileImageMenu() { document.getElementById('profile-menu-modal').classList.add('hidden'); }
+    function openFileSelector() { closeProfileImageMenu(); document.getElementById('profile-image-input').click(); }
+
+    async function resetToDefaultImage() {
+        closeProfileImageMenu();
+        if (!confirm('프로필 이미지를 기본 이미지로 변경하시겠습니까?')) return;
+        try {
+            const response = await fetch(`/api/players/${currentPlayerId}/reset-profile`, { method: 'POST' });
+            if (!response.ok) throw new Error((await response.json()).detail || '초기화 실패');
+            const result = await response.json();
+            document.getElementById('user-profile-img').src = result.profile_url;
+            alert('기본 이미지로 변경되었습니다.');
+        } catch (error) { alert('기본 이미지로 변경하는데 실패했습니다.'); }
+    }
+
+    async function handleImageSelect(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) { alert('이미지 파일만 업로드 가능합니다.'); return; }
+        if (file.size > 5 * 1024 * 1024) { alert('파일 크기는 5MB를 초과할 수 없습니다.'); return; }
+        try {
+            const resizedBlob = await resizeImage(file, 500, 500);
+            document.getElementById('user-profile-img').src = URL.createObjectURL(resizedBlob);
+            await uploadProfileImage(resizedBlob);
+        } catch (error) { alert('이미지 업로드에 실패했습니다.'); }
+    }
+
+    function resizeImage(file, maxWidth, maxHeight) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    let width = img.width, height = img.height;
+                    if (width > height) { if (width > maxWidth) { height = height * maxWidth / width; width = maxWidth; } }
+                    else { if (height > maxHeight) { width = width * maxHeight / height; height = maxHeight; } }
+                    const size = Math.min(width, height);
+                    const canvas = document.createElement('canvas');
+                    canvas.width = size; canvas.height = size;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, (width-size)/2, (height-size)/2, size, size, 0, 0, size, size);
+                    canvas.toBlob(resolve, 'image/jpeg', 0.8);
+                };
+                img.onerror = reject;
+                img.src = e.target.result;
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    async function uploadProfileImage(blob) {
+        const formData = new FormData();
+        formData.append('file', blob, 'profile.jpg');
+        const response = await fetch(`/api/players/${currentPlayerId}/upload-profile`, { method: 'POST', body: formData });
+        if (!response.ok) throw new Error((await response.json()).detail || '업로드 실패');
+        const result = await response.json();
+        document.getElementById('user-profile-img').src = result.profile_url;
+    }
+    // ───────────────────────────────────────────────────
+
+    // ── 테마 토글 ──────────────────────────────────────
+    function initThemeToggle() {
+        const theme = localStorage.getItem('tichu_theme') || 'light';
+        applyToggleUI(theme);
+    }
+
+    function toggleTheme() {
+        const current = localStorage.getItem('tichu_theme') || 'light';
+        const next = current === 'light' ? 'dark' : 'light';
+        localStorage.setItem('tichu_theme', next);
+        document.documentElement.setAttribute('data-theme', next);
+        applyToggleUI(next);
+    }
+
+    function applyToggleUI(theme) {
+        document.querySelectorAll('.theme-toggle-track').forEach(track => {
+            track.style.backgroundColor = theme === 'dark' ? '#4F46E5' : '#D1D5DB';
+        });
+        document.querySelectorAll('.theme-toggle-thumb').forEach(thumb => {
+            thumb.style.transform = theme === 'dark' ? 'translateX(1.75rem)' : 'translateX(0)';
+        });
+    }
+    // ───────────────────────────────────────────────────
+
+    function checkAuthAndLoadSettings() {
+        const auth = AuthManager.getAuth();
+        if (!auth) {
+            showAuthRequired();
+        } else if (auth.role === 'admin') {
+            showAdminSettings();
+        } else {
+            currentPlayerId = auth.playerId;
+            showUserSettings(auth.playerId);
+        }
+    }
+
+    function showAuthRequired() {
+        document.getElementById('auth-required-section').classList.remove('hidden');
+        document.getElementById('user-settings-section').classList.add('hidden');
+        document.getElementById('admin-settings-section').classList.add('hidden');
+    }
+
+    function requestAuth() {
+        AuthManager.showAuthModal((data) => { checkAuthAndLoadSettings(); });
+    }
+
+    async function showUserSettings(playerId) {
+        document.getElementById('auth-required-section').classList.add('hidden');
+        document.getElementById('user-settings-section').classList.remove('hidden');
+        document.getElementById('admin-settings-section').classList.add('hidden');
+        try {
+            const response = await fetch(`/api/players/${playerId}`);
+            const player = await response.json();
+            document.getElementById('user-profile-img').src = player.profile_url;
+            document.getElementById('user-profile-name').textContent = player.name;
+            document.getElementById('edit-name').value = player.name;
+            document.getElementById('edit-code').value = player.code;
+        } catch (error) { console.error('유저 정보 로드 실패:', error); }
+    }
+
+    function showAdminSettings() {
+        document.getElementById('auth-required-section').classList.add('hidden');
+        document.getElementById('user-settings-section').classList.add('hidden');
+        document.getElementById('admin-settings-section').classList.remove('hidden');
+        switchAdminTab('users');
+    }
+
+    function switchAdminTab(tab) {
+        const usersTabBtn = document.getElementById('tab-users');
+        const dataTabBtn = document.getElementById('tab-data');
+        const activeStyle = ['bg-white', 'text-gray-800', 'shadow-sm'];
+
+        if (tab === 'users') {
+            usersTabBtn.classList.add(...activeStyle);
+            usersTabBtn.classList.remove('text-gray-400', 'hover:text-gray-600');
+            dataTabBtn.classList.remove(...activeStyle);
+            dataTabBtn.classList.add('text-gray-400', 'hover:text-gray-600');
+            document.getElementById('admin-users-tab').classList.remove('hidden');
+            document.getElementById('admin-data-tab').classList.add('hidden');
+            loadAllUsers();
+        } else {
+            dataTabBtn.classList.add(...activeStyle);
+            dataTabBtn.classList.remove('text-gray-400', 'hover:text-gray-600');
+            usersTabBtn.classList.remove(...activeStyle);
+            usersTabBtn.classList.add('text-gray-400', 'hover:text-gray-600');
+            document.getElementById('admin-users-tab').classList.add('hidden');
+            document.getElementById('admin-data-tab').classList.remove('hidden');
+        }
+    }
+
+    async function loadAllUsers() {
+        try {
+            const adminCode = AuthManager.getAdminCode();
+            const response = await fetch('/api/admin/users', { headers: { 'Authorization': adminCode } });
+            if (!response.ok) throw new Error('유저 목록 로드 실패');
+            const players = await response.json();
+            const usersList = document.getElementById('admin-users-list');
+            usersList.innerHTML = '';
+            if (players.length === 0) {
+                usersList.innerHTML = '<p class="text-center text-gray-400 py-10 text-sm">등록된 유저가 없습니다.</p>';
+                return;
+            }
+            players.forEach(player => {
+                const div = document.createElement('div');
+                div.className = 's-user-row flex items-center justify-between p-4 rounded-2xl shadow-sm';
+                div.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <img src="${player.profile_url}" alt="${player.name}" class="w-12 h-12 rounded-full object-cover" style="background-color: var(--bg-card-sub);">
+                        <div>
+                            <p class="font-bold text-base s-user-name">${player.name}</p>
+                            <p class="text-xs font-mono s-user-code">CODE: ${player.code}</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="deleteUser(${player.id}, '${player.name}')" class="bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 px-4 py-2 rounded-xl text-xs font-bold transition">삭제</button>
+                    </div>
+                `;
+                usersList.appendChild(div);
+            });
+        } catch (error) {
+            console.error('유저 목록 로드 실패:', error);
+            alert('유저 목록을 불러오는데 실패했습니다.');
+        }
+    }
+
+    function toggleCodeVisibility() {
+        const input = document.getElementById('edit-code');
+        input.type = input.type === 'password' ? 'text' : 'password';
+    }
+
+    async function saveProfile() {
+        const name = document.getElementById('edit-name').value.trim();
+        const code = document.getElementById('edit-code').value;
+        const errorDiv = document.getElementById('edit-error-message');
+        if (!name) { errorDiv.textContent = '이름을 입력해주세요.'; errorDiv.classList.remove('hidden'); return; }
+        if (!code) { errorDiv.textContent = '코드를 입력해주세요.'; errorDiv.classList.remove('hidden'); return; }
+        if (/\s/.test(code)) { errorDiv.textContent = '코드에는 공백을 포함할 수 없습니다.'; errorDiv.classList.remove('hidden'); return; }
+        try {
+            const response = await fetch(`/api/players/${currentPlayerId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, code })
+            });
+            if (!response.ok) {
+                const error = await response.json();
+                errorDiv.textContent = error.detail || '저장에 실패했습니다.';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+            errorDiv.classList.add('hidden');
+            alert('프로필이 저장되었습니다!');
+        } catch (error) {
+            errorDiv.textContent = '저장 중 오류가 발생했습니다.';
+            errorDiv.classList.remove('hidden');
+        }
+    }
+
+    async function deleteUser(playerId, playerName) {
+        if (!confirm(`정말 ${playerName}님을 삭제하시겠습니까?\n관련된 모든 게임 기록도 함께 삭제됩니다.`)) return;
+        try {
+            const adminCode = AuthManager.getAdminCode();
+            const response = await fetch(`/api/admin/users/${playerId}`, { method: 'DELETE', headers: { 'Authorization': adminCode } });
+            if (!response.ok) throw new Error('삭제 실패');
+            alert(`${playerName}님이 삭제되었습니다.`);
+            loadAllUsers();
+        } catch (error) {
+            alert('삭제 중 오류가 발생했습니다.');
+        }
+    }
+
+    async function confirmResetAll() {
+        if (!confirm('⚠️ 경고: 모든 데이터(플레이어, 매치, 통계)가 영구 삭제됩니다.\n정말 진행하시겠습니까?')) return;
+        if (!confirm('정말로 모든 데이터를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다!')) return;
+        try {
+            const adminCode = AuthManager.getAdminCode();
+            const response = await fetch('/api/admin/reset-all', { method: 'DELETE', headers: { 'Authorization': adminCode } });
+            if (!response.ok) throw new Error('초기화 실패');
+            alert('모든 데이터가 삭제되었습니다.');
+            AuthManager.logout();
+            window.location.href = '/';
+        } catch (error) {
+            alert('초기화 중 오류가 발생했습니다.');
+        }
+    }
+
+    function logout() {
+        AuthManager.logout();
+        window.location.href = '/';
+    }
+</script>
+{% endblock %}

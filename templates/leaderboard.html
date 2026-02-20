@@ -1,0 +1,348 @@
+{% extends "base.html" %}
+
+{% block title %}랭킹 - Tichu Manager{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --bg-main: #F4F4F8;
+        --bg-card: #FFFFFF;
+        --bg-card-hover: #F8F8FC;
+        --bg-card-sub: #F0F0F6;
+        --border: rgba(0, 0, 0, 0.07);
+        --text-primary: #0F0F1A;
+        --text-secondary: #6B7280;
+        --text-muted: #9CA3AF;
+        --text-label: #A0A0B0;
+        --accent: #4F46E5;
+        --accent-hover: #4338CA;
+        --divider: rgba(0,0,0,0.06);
+
+        --badge-default-bg: rgba(0,0,0,0.03);
+        --badge-default-border: rgba(0,0,0,0.08);
+        --badge-default-text: #6B7280;
+        --badge-tichu-bg: rgba(234,179,8,0.08);
+        --badge-tichu-border: rgba(234,179,8,0.2);
+        --badge-tichu-text: #A16207;
+        --badge-grand-bg: rgba(147,51,234,0.08);
+        --badge-grand-border: rgba(147,51,234,0.2);
+        --badge-grand-text: #7E22CE;
+
+        --tab-inactive: #9CA3AF;
+        --spinner-color: var(--accent);
+    }
+
+    [data-theme="dark"] {
+        --bg-main: #0F0F1A;
+        --bg-card: #1A1A2E;
+        --bg-card-hover: #212136;
+        --bg-card-sub: #0F0F1A;
+        --border: rgba(255, 255, 255, 0.08);
+        --text-primary: #FFFFFF;
+        --text-secondary: #9CA3AF;
+        --text-muted: #6B7280;
+        --text-label: #6B7280;
+        --accent: #6366F1;
+        --accent-hover: #4F46E5;
+        --divider: rgba(255,255,255,0.05);
+
+        --badge-default-bg: rgba(255,255,255,0.05);
+        --badge-default-border: rgba(255,255,255,0.1);
+        --badge-default-text: #9CA3AF;
+        --badge-tichu-bg: rgba(234,179,8,0.1);
+        --badge-tichu-border: rgba(234,179,8,0.2);
+        --badge-tichu-text: #FCD34D;
+        --badge-grand-bg: rgba(147,51,234,0.1);
+        --badge-grand-border: rgba(147,51,234,0.2);
+        --badge-grand-text: #C084FC;
+
+        --tab-inactive: #6B7280;
+        --spinner-color: var(--accent);
+    }
+
+    .page-bg { background-color: var(--bg-main); min-height: 100vh; }
+
+    .lb-back-btn {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border);
+        box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+        color: var(--text-secondary);
+        border-radius: 9999px;
+        width: 2.25rem; height: 2.25rem;
+        display: flex; align-items: center; justify-content: center;
+        transition: all 0.15s;
+    }
+    .lb-back-btn:hover { color: var(--text-primary); }
+
+    .lb-title { color: var(--text-primary); }
+
+    .year-select {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border);
+        color: var(--text-primary);
+        font-size: 0.75rem;
+        font-weight: 700;
+        border-radius: 0.75rem;
+        padding: 0.5rem;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+        outline: none;
+    }
+
+    .tab-bar {
+        background-color: var(--bg-card-sub);
+        border-radius: 1rem;
+        padding: 0.25rem;
+        display: flex;
+        margin-bottom: 1.5rem;
+    }
+    .tab-btn {
+        flex: 1;
+        padding: 0.75rem;
+        font-size: 0.875rem;
+        font-weight: 700;
+        border-radius: 0.75rem;
+        transition: all 0.15s;
+    }
+    .tab-btn.active {
+        background-color: var(--bg-card);
+        color: var(--accent);
+        box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    .tab-btn.inactive { color: var(--tab-inactive); }
+    .tab-btn.inactive:hover { color: var(--text-secondary); }
+
+    .rank-card {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 1rem;
+        padding: 1rem;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    .rank-num { color: var(--text-muted); font-weight: 700; font-family: monospace; font-size: 0.75rem; width: 2rem; text-align: center; }
+    .player-name-text { color: var(--text-primary); font-size: 1rem; font-weight: 900; }
+    .team-name-text { color: var(--text-primary); font-size: 0.875rem; font-weight: 900; }
+    .win-rate-text { color: var(--accent); font-size: 1rem; font-weight: 900; }
+
+    .badge {
+        display: inline-flex; align-items: center;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.375rem;
+        font-size: 0.625rem;
+        font-weight: 700;
+        border: 1px solid;
+    }
+    .badge-default { background-color: var(--badge-default-bg); border-color: var(--badge-default-border); color: var(--badge-default-text); }
+    .badge-tichu { background-color: var(--badge-tichu-bg); border-color: var(--badge-tichu-border); color: var(--badge-tichu-text); }
+    .badge-grand { background-color: var(--badge-grand-bg); border-color: var(--badge-grand-border); color: var(--badge-grand-text); }
+
+    .empty-state { color: var(--text-muted); }
+    .error-state { color: #F43F5E; font-size: 0.75rem; }
+
+    .spinner {
+        border: 4px solid var(--bg-card-sub);
+        border-top-color: var(--accent);
+        border-radius: 9999px;
+        width: 2rem; height: 2rem;
+        animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+
+<div class="page-bg">
+    <div class="max-w-md mx-auto px-4 pb-20">
+        <div class="relative flex items-center justify-between py-6 mb-2">
+            <a href="/" class="lb-back-btn group-active:scale-95 transition-transform z-10">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+            </a>
+
+            <h1 class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <span class="text-xl font-black tracking-tight flex items-center gap-1 lb-title">
+                    <span class="text-2xl">🏆</span>
+                    <span>명예의 전당</span>
+                </span>
+            </h1>
+
+            <div class="z-10">
+                <select id="year-filter" class="year-select"></select>
+            </div>
+        </div>
+
+        <div class="tab-bar">
+            <button id="tab-individual" onclick="switchTab('individual')" class="tab-btn active">👤 개인 랭킹</button>
+            <button id="tab-team" onclick="switchTab('team')" class="tab-btn inactive">👥 팀 랭킹</button>
+        </div>
+
+        <div class="relative min-h-[300px]">
+            <div id="loading-spinner" class="hidden absolute inset-0 z-20 flex items-start pt-20 justify-center">
+                <div class="spinner"></div>
+            </div>
+
+            <div id="individual-list" class="space-y-3 pb-10"></div>
+            <div id="team-list" class="hidden space-y-3 pb-10"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    let currentTab = 'individual';
+    let currentYear = new Date().getFullYear().toString();
+
+    document.addEventListener('DOMContentLoaded', () => {
+        initYearFilter();
+        loadLeaderboard();
+        document.getElementById('year-filter').addEventListener('change', (e) => {
+            currentYear = e.target.value;
+            loadLeaderboard();
+        });
+    });
+
+    function initYearFilter() {
+        const yearFilter = document.getElementById('year-filter');
+        const currentYearNum = new Date().getFullYear();
+
+        const allOption = document.createElement('option');
+        allOption.value = '';
+        allOption.textContent = '전체 기간';
+        yearFilter.appendChild(allOption);
+
+        const startYear = 2026;
+        for (let year = currentYearNum; year >= startYear; year--) {
+            const option = document.createElement('option');
+            option.value = year;
+            option.textContent = `${year} 시즌`;
+            if (year === currentYearNum) option.selected = true;
+            yearFilter.appendChild(option);
+        }
+        currentYear = currentYearNum.toString();
+    }
+
+    function switchTab(tab) {
+        currentTab = tab;
+        const indTab = document.getElementById('tab-individual');
+        const teamTab = document.getElementById('tab-team');
+
+        if (tab === 'individual') {
+            indTab.className = 'tab-btn active';
+            teamTab.className = 'tab-btn inactive';
+            document.getElementById('individual-list').classList.remove('hidden');
+            document.getElementById('team-list').classList.add('hidden');
+        } else {
+            teamTab.className = 'tab-btn active';
+            indTab.className = 'tab-btn inactive';
+            document.getElementById('team-list').classList.remove('hidden');
+            document.getElementById('individual-list').classList.add('hidden');
+        }
+        loadLeaderboard();
+    }
+
+    async function loadLeaderboard() {
+        document.getElementById('loading-spinner').classList.remove('hidden');
+        try {
+            if (currentTab === 'individual') await loadIndividualLeaderboard();
+            else await loadTeamLeaderboard();
+        } finally {
+            document.getElementById('loading-spinner').classList.add('hidden');
+        }
+    }
+
+    async function loadIndividualLeaderboard() {
+        try {
+            const url = currentYear ? `/api/stats/leaderboard?year=${currentYear}` : '/api/stats/leaderboard';
+            const response = await fetch(url);
+            const leaderboard = await response.json();
+            const container = document.getElementById('individual-list');
+            container.innerHTML = '';
+
+            if (leaderboard.length === 0) {
+                container.innerHTML = `<div class="text-center py-20 empty-state"><p class="text-4xl mb-2">📊</p><p class="text-sm">기록이 없습니다.</p></div>`;
+                return;
+            }
+
+            leaderboard.forEach((entry) => {
+                const div = document.createElement('div');
+                div.className = 'rank-card';
+
+                let rankDisplay = `<span class="rank-num">#${entry.rank}</span>`;
+                if (entry.rank === 1) rankDisplay = '<span class="text-2xl w-8 text-center">🥇</span>';
+                else if (entry.rank === 2) rankDisplay = '<span class="text-2xl w-8 text-center">🥈</span>';
+                else if (entry.rank === 3) rankDisplay = '<span class="text-2xl w-8 text-center">🥉</span>';
+
+                div.innerHTML = `
+                    <div class="flex flex-col items-center gap-1 shrink-0">
+                        ${rankDisplay}
+                        <img src="${entry.stats.profile_url}" class="w-10 h-10 rounded-full object-cover" style="border: 1px solid var(--border);">
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="player-name-text truncate pr-2">${entry.stats.player_name}</span>
+                            <span class="win-rate-text shrink-0">${entry.stats.win_rate}%</span>
+                        </div>
+                        <div class="flex flex-wrap gap-1.5">
+                            <span class="badge badge-default">${entry.stats.wins}승 ${entry.stats.losses}패</span>
+                            <span class="badge badge-tichu">스몰 ${entry.stats.tichu_success_rate}% (${entry.stats.tichu_success}/${entry.stats.tichu_try})</span>
+                            <span class="badge badge-grand">라지 ${entry.stats.grand_success_rate}% (${entry.stats.grand_success}/${entry.stats.grand_try})</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        } catch (e) {
+            console.error(e);
+            document.getElementById('individual-list').innerHTML = '<div class="text-center py-10 error-state">데이터 로드 실패</div>';
+        }
+    }
+
+    async function loadTeamLeaderboard() {
+        try {
+            const url = currentYear ? `/api/stats/leaderboard/teams?year=${currentYear}` : '/api/stats/leaderboard/teams';
+            const response = await fetch(url);
+            const leaderboard = await response.json();
+            const container = document.getElementById('team-list');
+            container.innerHTML = '';
+
+            if (leaderboard.length === 0) {
+                container.innerHTML = `<div class="text-center py-20 empty-state"><p class="text-4xl mb-2">👥</p><p class="text-sm">팀 기록이 없습니다.</p></div>`;
+                return;
+            }
+
+            leaderboard.forEach((entry) => {
+                const div = document.createElement('div');
+                div.className = 'rank-card';
+
+                let rankDisplay = `<span class="rank-num">#${entry.rank}</span>`;
+                if (entry.rank === 1) rankDisplay = '<span class="text-2xl w-8 text-center">🥇</span>';
+                else if (entry.rank === 2) rankDisplay = '<span class="text-2xl w-8 text-center">🥈</span>';
+                else if (entry.rank === 3) rankDisplay = '<span class="text-2xl w-8 text-center">🥉</span>';
+
+                div.innerHTML = `
+                    <div class="flex flex-col items-center justify-center shrink-0 w-10">
+                        ${rankDisplay}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="team-name-text truncate pr-2">${entry.stats.team_name}</span>
+                            <span class="win-rate-text shrink-0">${entry.stats.win_rate}%</span>
+                        </div>
+                        <div class="flex flex-wrap gap-1.5">
+                            <span class="badge badge-default">${entry.stats.wins}승 ${entry.stats.losses}패</span>
+                            <span class="badge badge-tichu">스몰 ${entry.stats.tichu_success_rate}% (${entry.stats.tichu_success}/${entry.stats.tichu_try})</span>
+                            <span class="badge badge-grand">라지 ${entry.stats.grand_success_rate}% (${entry.stats.grand_success}/${entry.stats.grand_try})</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        } catch (e) {
+            console.error(e);
+            document.getElementById('team-list').innerHTML = '<div class="text-center py-10 error-state">데이터 로드 실패</div>';
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block title %}홈 - Tichu Manager{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --bg-main: #F4F4F8;
+        --bg-card: #FFFFFF;
+        --bg-card-hover: #F8F8FC;
+        --bg-card-sub: #F0F0F6;
+        --border: rgba(0, 0, 0, 0.07);
+        --text-primary: #0F0F1A;
+        --text-secondary: #6B7280;
+        --text-muted: #9CA3AF;
+        --text-label: #A0A0B0;
+        --accent: #4F46E5;
+        --accent-hover: #4338CA;
+        --accent-shadow: rgba(79, 70, 229, 0.25);
+        --score-a: #4F46E5;
+        --score-b: #F43F5E;
+        --divider: rgba(0,0,0,0.06);
+    }
+
+    [data-theme="dark"] {
+        --bg-main: #0F0F1A;
+        --bg-card: #1A1A2E;
+        --bg-card-hover: #212136;
+        --bg-card-sub: #0F0F1A;
+        --border: rgba(255, 255, 255, 0.08);
+        --text-primary: #FFFFFF;
+        --text-secondary: #9CA3AF;
+        --text-muted: #6B7280;
+        --text-label: #6B7280;
+        --accent: #6366F1;
+        --accent-hover: #4F46E5;
+        --accent-shadow: rgba(99, 102, 241, 0.3);
+        --score-a: #818CF8;
+        --score-b: #FB7185;
+        --divider: rgba(255,255,255,0.05);
+    }
+
+    .home-bg { background-color: var(--bg-main); }
+
+    .home-card {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 1rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        transition: background-color 0.2s, transform 0.15s;
+    }
+    .home-card:active { transform: scale(0.98); }
+    .home-card-hover:hover { background-color: var(--bg-card-hover); }
+
+    .accent-card {
+        background-color: var(--accent);
+        border-radius: 1rem;
+        box-shadow: 0 4px 16px var(--accent-shadow);
+        transition: background-color 0.2s, transform 0.15s;
+    }
+    .accent-card:active { transform: scale(0.98); }
+    .accent-card:hover { background-color: var(--accent-hover); }
+
+    .ongoing-inner {
+        background-color: var(--bg-card-sub);
+        border: 1px solid var(--divider);
+        border-radius: 0.75rem;
+    }
+
+    .t-primary { color: var(--text-primary); }
+    .t-secondary { color: var(--text-secondary); }
+    .t-muted { color: var(--text-muted); }
+    .t-label { color: var(--text-label); }
+    .t-accent { color: var(--accent); }
+    .t-score-a { color: var(--score-a); }
+    .t-score-b { color: var(--score-b); }
+
+    .card-divider { border-color: var(--divider); }
+
+    .accent-btn {
+        background-color: #10B981;
+        color: white;
+        border-radius: 0.625rem;
+        font-weight: 700;
+        font-size: 0.875rem;
+        padding: 0.625rem;
+        width: 100%;
+        transition: background-color 0.2s, transform 0.15s;
+    }
+    .accent-btn:hover { background-color: #059669; }
+    .accent-btn:active { transform: scale(0.98); }
+</style>
+
+<div class="home-bg min-h-screen">
+    <div class="max-w-lg mx-auto px-4 py-8 flex flex-col min-h-screen">
+
+        <!-- 타이틀 -->
+        <div class="mb-8 mt-2">
+            <h1 class="text-3xl font-black tracking-widest t-primary uppercase">
+                <span class="relative inline-block">
+                    Tichu
+                    <div class="absolute -bottom-1 left-0 right-0 h-0.5 rounded-full" style="background-color: var(--accent);"></div>
+                </span>
+                <span class="t-accent"> Manager</span>
+            </h1>
+        </div>
+
+        <!-- 카드 리스트 -->
+        <div class="flex flex-col gap-3 flex-1">
+
+            <!-- 새 게임 시작 -->
+            <a href="/team-selection" class="accent-card p-6 flex items-center justify-between touch-manipulation">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-widest mb-1" style="color: rgba(255,255,255,0.6);">Play</p>
+                    <h2 class="text-2xl font-black text-white">새 게임 시작</h2>
+                </div>
+                <div class="text-4xl">🎮</div>
+            </a>
+
+            <!-- 이어하기 - 게임 없을 때 (기본) -->
+            <div id="ongoing-empty-card" class="home-card p-6 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-widest t-label mb-1">Continue</p>
+                    <h2 class="text-2xl font-black t-primary">이어하기</h2>
+                </div>
+                <div class="text-4xl">⏸️</div>
+            </div>
+
+            <!-- 이어하기 - 게임 있을 때 (이모지 없음) -->
+            <div id="ongoing-games-card" class="hidden home-card p-5">
+                <div class="mb-4 pb-3 border-b card-divider">
+                    <p class="text-xs font-bold uppercase tracking-widest t-label mb-0.5">Continue</p>
+                    <h2 class="text-lg font-black t-primary">이어하기</h2>
+                </div>
+                <div id="ongoing-games-list" class="space-y-3"></div>
+            </div>
+
+            <!-- 랭킹 보기 -->
+            <a href="/leaderboard" class="home-card home-card-hover p-6 flex items-center justify-between touch-manipulation">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-widest t-label mb-1">Ranking</p>
+                    <h2 class="text-2xl font-black t-primary">랭킹 보기</h2>
+                </div>
+                <div class="text-4xl">🏆</div>
+            </a>
+
+            <!-- 설정 -->
+            <a href="/settings" class="home-card home-card-hover p-6 flex items-center justify-between touch-manipulation">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-widest t-label mb-1">Settings</p>
+                    <h2 class="text-2xl font-black t-primary">설정</h2>
+                </div>
+                <div class="text-4xl">⚙️</div>
+            </a>
+
+        </div>
+
+        <div class="mt-8 text-center">
+            <p class="text-[10px] font-bold uppercase tracking-widest t-muted">Tichu Manager v1.0.0</p>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        loadOngoingGames();
+    });
+
+    async function loadOngoingGames() {
+        const emptyCard = document.getElementById('ongoing-empty-card');
+        const gamesCard = document.getElementById('ongoing-games-card');
+        const container = document.getElementById('ongoing-games-list');
+
+        try {
+            const authData = localStorage.getItem('tichu_auth');
+            if (!authData) return;
+
+            let currentPlayerId;
+            try {
+                const auth = JSON.parse(authData);
+                currentPlayerId = auth.playerId;
+            } catch (error) {
+                console.error('인증 정보 파싱 실패:', error);
+                return;
+            }
+
+            if (!currentPlayerId) return;
+
+            const response = await fetch(`/api/matches/ongoing/${currentPlayerId}`);
+            const games = await response.json();
+
+            if (games.length === 0) return;
+
+            // 게임 있으면 카드 전환
+            emptyCard.classList.add('hidden');
+            gamesCard.classList.remove('hidden');
+
+            games.forEach(game => {
+                const div = document.createElement('div');
+                div.className = 'ongoing-inner p-4';
+
+                const teamANames = game.team_a_players.map(p => p.name).join(', ');
+                const teamBNames = game.team_b_players.map(p => p.name).join(', ');
+
+                div.innerHTML = `
+                    <div class="flex flex-col gap-3">
+                        <div class="text-right text-xs font-medium t-muted">${game.play_date}</div>
+                        <div class="grid grid-cols-3 items-center">
+                            <div class="text-center">
+                                <p class="text-3xl font-black t-score-a leading-none">${game.score_a}</p>
+                                <p class="text-xs font-bold t-secondary mt-1">Team A</p>
+                                <p class="text-[10px] t-muted truncate px-1">${teamANames}</p>
+                            </div>
+                            <div class="text-center text-xs font-black t-muted tracking-widest">VS</div>
+                            <div class="text-center">
+                                <p class="text-3xl font-black t-score-b leading-none">${game.score_b}</p>
+                                <p class="text-xs font-bold t-secondary mt-1">Team B</p>
+                                <p class="text-[10px] t-muted truncate px-1">${teamBNames}</p>
+                            </div>
+                        </div>
+                        <button onclick="window.location.href='/scoreboard/${game.id}'" class="accent-btn touch-manipulation">
+                            이어하기 →
+                        </button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+
+        } catch (error) {
+            console.error('진행 중인 게임 로드 실패:', error);
+        }
+    }
+</script>
+{% endblock %}
