@@ -296,6 +296,7 @@
     .event-empty { color: var(--text-muted); border: 1px dashed var(--round-empty-border); border-radius: 0.75rem; }
     .event-delete { color: var(--text-muted); font-size: 0.75rem; font-weight: 700; }
     .event-delete:hover { color: #F43F5E; }
+    .event-toggle-default { background-color: var(--bg-card); color: var(--text-primary); }
 
     .modal-footer {
         background-color: var(--modal-footer-bg);
@@ -750,13 +751,13 @@
                 });
                 btns += '</div></div>';
                 content = `${btns}<div class="flex gap-1">
-                    <label class="flex-1 cursor-pointer"><input type="radio" name="s_${i}" ${e.success ? 'checked' : ''} onchange="updateEventSuccess(${i}, true)" class="peer hidden"><div class="text-xs text-center font-bold py-2 rounded-lg border peer-checked:bg-emerald-500 peer-checked:text-white transition" style="background-color:var(--bg-card);color:var(--text-primary)">성공</div></label>
-                    <label class="flex-1 cursor-pointer"><input type="radio" name="s_${i}" ${e.success === false ? 'checked' : ''} onchange="updateEventSuccess(${i}, false)" class="peer hidden"><div class="text-xs text-center font-bold py-2 rounded-lg border peer-checked:bg-red-500 peer-checked:text-white transition" style="background-color:var(--bg-card);color:var(--text-primary)">실패</div></label>
+                    <label class="flex-1 cursor-pointer"><input type="radio" name="s_${i}" ${e.success ? 'checked' : ''} onchange="updateEventSuccess(${i}, true)" class="peer hidden"><div class="text-xs text-center font-bold py-2 rounded-lg border peer-checked:bg-emerald-500 peer-checked:text-white transition event-toggle-default">성공</div></label>
+                    <label class="flex-1 cursor-pointer"><input type="radio" name="s_${i}" ${e.success === false ? 'checked' : ''} onchange="updateEventSuccess(${i}, false)" class="peer hidden"><div class="text-xs text-center font-bold py-2 rounded-lg border peer-checked:bg-red-500 peer-checked:text-white transition event-toggle-default">실패</div></label>
                 </div>`;
             } else {
                 content = `<div class="flex gap-1 mt-2">
-                    <label class="flex-1 cursor-pointer"><input type="radio" name="t_${i}" ${e.team==='A'?'checked':''} onchange="updateEventTeam(${i}, 'A')" class="peer hidden"><div class="text-xs text-center font-bold py-2 rounded-lg border peer-checked:bg-blue-600 peer-checked:text-white transition" style="background-color:var(--bg-card);color:var(--text-primary)">TEAM A</div></label>
-                    <label class="flex-1 cursor-pointer"><input type="radio" name="t_${i}" ${e.team==='B'?'checked':''} onchange="updateEventTeam(${i}, 'B')" class="peer hidden"><div class="text-xs text-center font-bold py-2 rounded-lg border peer-checked:bg-red-600 peer-checked:text-white transition" style="background-color:var(--bg-card);color:var(--text-primary)">TEAM B</div></label>
+                    <label class="flex-1 cursor-pointer"><input type="radio" name="t_${i}" ${e.team==='A'?'checked':''} onchange="updateEventTeam(${i}, 'A')" class="peer hidden"><div class="text-xs text-center font-bold py-2 rounded-lg border peer-checked:bg-blue-600 peer-checked:text-white transition event-toggle-default">TEAM A</div></label>
+                    <label class="flex-1 cursor-pointer"><input type="radio" name="t_${i}" ${e.team==='B'?'checked':''} onchange="updateEventTeam(${i}, 'B')" class="peer hidden"><div class="text-xs text-center font-bold py-2 rounded-lg border peer-checked:bg-red-600 peer-checked:text-white transition event-toggle-default">TEAM B</div></label>
                 </div>`;
             }
             div.innerHTML = `<div class="flex justify-between items-center mb-2"><span class="text-sm font-black" style="color:${titleColor}">${title}</span><button onclick="removeEvent(${i})" class="event-delete px-2">삭제</button></div>${content}`;
