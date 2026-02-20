@@ -47,4 +47,4 @@ def init_db():
     모든 테이블 생성 (애플리케이션 시작 시 호출)
     """
     from models.models import Player, Match, MatchStats  # 순환 import 방지
-    Base.metadata.create_all(bind=engine)
+    Base.metadata.create_all(bind=engine, checkfirst=True)
