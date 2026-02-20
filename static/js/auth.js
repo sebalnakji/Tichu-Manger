@@ -72,12 +72,15 @@ const AuthManager = {
     /**
      * 인증 모달 표시
      */
-    showAuthModal(onSuccess) {
+    showAuthModal(onSuccess, onCancel) {
         const modal = document.getElementById('auth-modal');
         if (!modal) {
             console.error('인증 모달을 찾을 수 없습니다.');
             return;
         }
+
+        // 취소 콜백 저장
+        this._onCancel = onCancel || null;
 
         // 모달 표시
         modal.classList.remove('hidden');
@@ -111,6 +114,11 @@ const AuthManager = {
         const modal = document.getElementById('auth-modal');
         if (modal) {
             modal.classList.add('hidden');
+        }
+        if (this._onCancel) {
+            const cb = this._onCancel;
+            this._onCancel = null;
+            cb();
         }
     },
 
@@ -153,6 +161,7 @@ const AuthManager = {
                 this.setAdminCode(code);
             }
 
+            this._onCancel = null;
             this.closeAuthModal();
 
             if (onSuccess) {
