@@ -10,7 +10,7 @@ from core.database import Base
 
 class Player(Base):
     """플레이어 정보"""
-    __tablename__ = "players"
+    __tablename__ = "tichu_players"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     name = Column(String(50), nullable=False, unique=True, comment="플레이어 이름")
@@ -30,7 +30,7 @@ class Player(Base):
 
 class Match(Base):
     """게임 매치 기록"""
-    __tablename__ = "matches"
+    __tablename__ = "tichu_matches"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     play_date = Column(Date, default=date.today, nullable=False, comment="게임 날짜")
@@ -78,20 +78,19 @@ class MatchStats(Base):
     개인별 티츄/라지티츄 시도 및 성공 기록
     라운드별로 기록
     """
-    __tablename__ = "match_stats"
+    __tablename__ = "tichu_match_stats"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
 
-    # 외래키
     match_id = Column(
         Integer,
-        ForeignKey("matches.id", ondelete="CASCADE"),
+        ForeignKey("tichu_matches.id", ondelete="CASCADE"),
         nullable=False,
         comment="매치 ID"
     )
     player_id = Column(
         Integer,
-        ForeignKey("players.id", ondelete="CASCADE"),
+        ForeignKey("tichu_players.id", ondelete="CASCADE"),
         nullable=False,
         comment="플레이어 ID"
     )
