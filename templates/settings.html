@@ -28,6 +28,10 @@
         --tab-inactive-text: #9CA3AF;
         --user-badge-bg: #ECFDF5;
         --user-badge-text: #059669;
+        --team-a-text: #3730A3;
+        --team-a-score: #4F46E5;
+        --team-b-text: #9F1239;
+        --team-b-score: #F43F5E;
     }
 
     [data-theme="dark"] {
@@ -54,6 +58,10 @@
         --tab-inactive-text: #6B7280;
         --user-badge-bg: rgba(16,185,129,0.15);
         --user-badge-text: #34D399;
+        --team-a-text: #A5B4FC;
+        --team-a-score: #818CF8;
+        --team-b-text: #FDA4AF;
+        --team-b-score: #FB7185;
     }
 
     .s-bg { background-color: var(--bg-main); }
@@ -210,7 +218,7 @@
 
                 <div id="admin-data-tab" class="hidden space-y-3 pb-20">
                     <h3 class="text-xs font-bold uppercase mb-2 px-1 s-section-label">시스템 관리</h3>
-                    <button class="w-full flex items-center justify-between p-5 s-card rounded-2xl shadow-sm transition active:scale-95" style="hover:background-color:var(--bg-card-sub)">
+                    <button onclick="showMatchEditModal()" class="w-full flex items-center justify-between p-5 s-card rounded-2xl shadow-sm transition active:scale-95" style="hover:background-color:var(--bg-card-sub)">
                         <div class="flex items-center gap-4">
                             <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background-color:var(--bg-card-sub)">✏️</div>
                             <span class="font-bold s-text-primary">잘못된 기록 수정</span>
@@ -270,9 +278,23 @@
     </div>
 </div>
 
+<!-- 기록 수정 매치 목록 모달 -->
+<div id="match-edit-modal" class="hidden fixed inset-0 z-50 flex flex-col justify-end bg-black/60 backdrop-blur-sm" onclick="closeMatchEditModal()">
+    <div class="w-full max-w-md mx-auto rounded-t-3xl shadow-2xl animate-slide-up flex flex-col h-full" style="background-color:var(--bg-card);" onclick="event.stopPropagation()">
+        <div class="p-5 border-b flex items-center justify-between shrink-0" style="border-color:var(--border)">
+            <div class="w-9"></div>
+            <h3 class="text-lg font-black s-text-primary">기록 수정</h3>
+            <button onclick="closeMatchEditModal()" class="p-2 s-text-muted">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        <div id="match-edit-list" class="p-4 space-y-3 overflow-y-auto flex-1"></div>
+    </div>
+</div>
+
 <style>
     @keyframes slide-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
-    .animate-slide-up { animation: slide-up 0.3s ease-out; }
+    .animate-slide-up { animation: slide-up 0.3s ease-out forwards; }
 </style>
 {% endblock %}
 
@@ -535,6 +557,61 @@
             alert('초기화 중 오류가 발생했습니다.');
         }
     }
+
+    // ── 기록 수정 ─────────────────────────────────────
+    async function showMatchEditModal() {
+        const modal = document.getElementById('match-edit-modal');
+        const inner = modal.querySelector('.animate-slide-up');
+        inner.style.transform = 'translateY(100%)';
+        modal.classList.remove('hidden');
+        requestAnimationFrame(() => {
+            inner.style.transition = 'transform 0.3s ease-out';
+            inner.style.transform = 'translateY(0)';
+        });
+        const list = document.getElementById('match-edit-list');
+        list.innerHTML = '<p class="text-center py-8 s-text-muted text-sm">불러오는 중...</p>';
+        try {
+            const response = await fetch('/api/matches/finished?limit=10');
+            if (!response.ok) throw new Error('매치 목록 로드 실패');
+            const matches = await response.json();
+            list.innerHTML = '';
+            if (matches.length === 0) {
+                list.innerHTML = '<p class="text-center py-8 s-text-muted text-sm">완료된 게임이 없습니다.</p>';
+                return;
+            }
+            matches.forEach(match => {
+                const isWinnerA = match.winner_team === 'A';
+                const div = document.createElement('a');
+                div.href = `/scoreboard/${match.id}`;
+                div.className = 's-user-row flex flex-col p-4 rounded-2xl shadow-sm active:scale-95 transition block';
+                div.innerHTML = `
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-xs font-bold s-text-muted">${match.play_date}</span>
+                        <span class="text-xs font-bold px-2 py-0.5 rounded-full ${isWinnerA ? 'bg-blue-100 text-blue-600' : 'bg-red-100 text-red-600'}">
+                            ${isWinnerA ? 'TEAM A' : 'TEAM B'} 승리
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex-1">
+                            <p class="text-xs font-bold mb-0.5" style="color:var(--team-a-text)">TEAM A</p>
+                            <p class="text-sm font-bold s-text-primary">${match.team_a_names.join(', ')}</p>
+                        </div>
+                        <p class="text-2xl font-black shrink-0" style="color:var(--team-a-score)">${match.score_a}</p>
+                        <p class="text-sm font-bold s-text-muted shrink-0">vs</p>
+                        <p class="text-2xl font-black shrink-0" style="color:var(--team-b-score)">${match.score_b}</p>
+                        <div class="flex-1 text-right">
+                            <p class="text-xs font-bold mb-0.5" style="color:var(--team-b-text)">TEAM B</p>
+                            <p class="text-sm font-bold s-text-primary">${match.team_b_names.join(', ')}</p>
+                        </div>
+                    </div>`;
+                list.appendChild(div);
+            });
+        } catch (error) {
+            list.innerHTML = '<p class="text-center py-8 text-red-500 text-sm">목록을 불러오는데 실패했습니다.</p>';
+        }
+    }
+    function closeMatchEditModal() { document.getElementById('match-edit-modal').classList.add('hidden'); }
+    // ───────────────────────────────────────────────────
 
     function logout() {
         AuthManager.logout();

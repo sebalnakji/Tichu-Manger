@@ -8,10 +8,13 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from contextlib import asynccontextmanager
 
+from apscheduler.schedulers.background import BackgroundScheduler
+
 from core.properties import settings
 from core.database import init_db
 from core.logging_config import setup_logging, get_logger
 from routers import players_router, matches_router, stats_router, auth_router, admin_router
+from services.match_cleanup_service import cleanup_unfinished_matches
 
 
 # 로깅 초기화
@@ -36,9 +39,19 @@ async def lifespan(app: FastAPI):
     init_db()
     logger.info("데이터베이스 초기화 완료")
 
+    # 미완료 게임 정리 스케줄러
+    scheduler = BackgroundScheduler(timezone="Asia/Seoul")
+    scheduler.add_job(cleanup_unfinished_matches, "cron", hour=3, minute=0)
+    scheduler.start()
+    logger.info("미완료 게임 정리 스케줄러 등록 (매일 03:00 KST)")
+
+    # 서버 시작 시 1회 즉시 실행
+    cleanup_unfinished_matches()
+
     yield
 
     # Shutdown
+    scheduler.shutdown()
     logger.info("애플리케이션 종료")
 
 

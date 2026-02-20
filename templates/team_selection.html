@@ -129,6 +129,8 @@
     .add-modal-cancel { background-color: var(--bg-card-sub); color: var(--text-secondary); border-radius: 0.75rem; font-weight: 700; padding: 0.75rem; }
     .add-modal-submit { background-color: #10B981; color: white; border-radius: 0.75rem; font-weight: 700; padding: 0.75rem; }
     .add-modal-submit:hover { background-color: #059669; }
+    .toast { position: fixed; top: 1rem; left: 50%; transform: translateX(-50%); z-index: 100; background-color: #10B981; color: white; font-weight: 700; font-size: 0.875rem; padding: 0.75rem 1.5rem; border-radius: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+    .toast.show { opacity: 1; }
     .custom-scrollbar::-webkit-scrollbar { width: 4px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background-color: var(--scrollbar-color); border-radius: 20px; }
@@ -216,6 +218,8 @@
         </div>
     </div>
 
+    <div id="toast" class="toast"></div>
+
     <div id="add-member-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
         <div class="add-modal rounded-3xl p-6 w-full max-w-sm shadow-2xl transform transition-all">
             <div class="text-center mb-6">
@@ -251,6 +255,15 @@
         updateUIByAuthState();
         setupEventListeners();
         renderEmptySlots();
+
+        // 비로그인 시 자동으로 인증 모달 표시
+        if (!AuthManager.isAuthenticated()) {
+            AuthManager.showAuthModal((data) => {
+                const name = data.player_name || '관리자';
+                showToast(`${name}님, 환영합니다!`);
+                updateUIByAuthState();
+            });
+        }
     });
 
     let selectedPlayers = [];
@@ -375,6 +388,12 @@
     }
     function closeAddMemberModal() { document.getElementById('add-member-modal').classList.add('hidden'); }
     function closeResultModal() { document.getElementById('result-overlay').classList.add('hidden'); }
+    function showToast(message) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2000);
+    }
 
     async function createNewMember() {
         const name = document.getElementById('new-member-name').value.trim();
@@ -385,7 +404,7 @@
         try {
             const res = await fetch('/api/players/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, code }) });
             if (!res.ok) { const error = await res.json(); throw new Error(error.detail); }
-            closeAddMemberModal(); await loadPlayers();
+            closeAddMemberModal(); await loadPlayers(); showToast(`${name} 님이 등록되었습니다!`);
         } catch (e) { errorMsg.textContent = e.message || '등록 실패'; errorDiv.classList.remove('hidden'); }
     }
 
