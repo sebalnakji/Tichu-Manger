@@ -2,9 +2,11 @@
 Admin Router
 관리자 전용 API 엔드포인트
 """
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Header
 from sqlalchemy.orm import Session
+from sqlalchemy import extract
+from pydantic import BaseModel
 
 from core.database import get_db
 from core.properties import settings
@@ -13,6 +15,11 @@ from models.models import Player, Match, MatchStats
 from dto.player import PlayerResponse
 
 router = APIRouter(prefix="/api/admin", tags=["Admin"])
+
+
+class ResetRequest(BaseModel):
+    table: str  # 'players' | 'matches' | 'stats' | 'all'
+    year: Optional[int] = None
 logger = get_logger(__name__)
 
 
@@ -166,3 +173,69 @@ def delete_match_by_admin(
 
     logger.info(f"관리자: 매치 삭제 - ID {match_id}")
     return None
+
+
+@router.delete("/reset")
+def reset_data(
+        req: ResetRequest,
+        db: Session = Depends(get_db),
+        _: bool = Depends(verify_admin)
+):
+    """
+    테이블별 / 시즌별 데이터 초기화 (관리자 전용)
+    - table: 'players' | 'matches' | 'stats' | 'all'
+    - year: null이면 전체, 숫자면 해당 연도만
+    """
+    try:
+        deleted = {}
+
+        def delete_stats(y):
+            q = db.query(MatchStats)
+            if y:
+                match_ids = [m.id for m in db.query(Match.id).filter(extract('year', Match.play_date) == y).all()]
+                if not match_ids:
+                    return 0
+                q = q.filter(MatchStats.match_id.in_(match_ids))
+            return q.delete(synchronize_session=False)
+
+        def delete_matches(y):
+            q = db.query(Match)
+            if y:
+                q = q.filter(extract('year', Match.play_date) == y)
+            return q.delete(synchronize_session=False)
+
+        def delete_players(y):
+            q = db.query(Player)
+            if y:
+                q = q.filter(extract('year', Player.created_at) == y)
+            return q.delete(synchronize_session=False)
+
+        table = req.table
+        year = req.year
+
+        if table in ('stats', 'all'):
+            deleted['stats'] = delete_stats(year)
+        if table in ('matches', 'all'):
+            if table == 'matches':
+                deleted['stats'] = delete_stats(year)
+            deleted['matches'] = delete_matches(year)
+        if table in ('players', 'all'):
+            deleted['players'] = delete_players(year)
+
+        db.commit()
+
+        year_label = f"{year}년" if year else "전체"
+        table_labels = {'players': '플레이어', 'matches': '매치', 'stats': '통계', 'all': '전체'}
+        parts = [f"{table_labels.get(k, k)} {v}건" for k, v in deleted.items() if v > 0]
+        summary = ', '.join(parts) if parts else '삭제된 데이터 없음'
+
+        logger.warning(f"관리자: 데이터 초기화 - {table_labels[table]} {year_label} ({summary})")
+
+        return {"message": f"{summary} 삭제 완료"}
+    except Exception as e:
+        db.rollback()
+        logger.error(f"데이터 초기화 실패: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="데이터 초기화 중 오류가 발생했습니다."
+        )

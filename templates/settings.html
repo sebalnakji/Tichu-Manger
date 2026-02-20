@@ -225,10 +225,32 @@
                         </div>
                         <span class="s-text-muted">→</span>
                     </button>
-                    <button onclick="confirmResetAll()" class="w-full flex items-center justify-between p-5 bg-white border border-red-100 rounded-2xl shadow-sm hover:bg-red-50 transition active:scale-95 group">
+                    <h3 class="text-xs font-bold uppercase mt-4 mb-2 px-1 s-section-label">데이터 초기화</h3>
+                    <button onclick="openResetModal('players')" class="w-full flex items-center justify-between p-5 s-card rounded-2xl shadow-sm transition active:scale-95">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background-color:rgba(239,68,68,0.08)">👤</div>
+                            <span class="font-bold s-text-primary">플레이어 초기화</span>
+                        </div>
+                        <span class="s-text-muted">→</span>
+                    </button>
+                    <button onclick="openResetModal('matches')" class="w-full flex items-center justify-between p-5 s-card rounded-2xl shadow-sm transition active:scale-95">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background-color:rgba(239,68,68,0.08)">🎮</div>
+                            <span class="font-bold s-text-primary">매치 초기화</span>
+                        </div>
+                        <span class="s-text-muted">→</span>
+                    </button>
+                    <button onclick="openResetModal('stats')" class="w-full flex items-center justify-between p-5 s-card rounded-2xl shadow-sm transition active:scale-95">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background-color:rgba(239,68,68,0.08)">📊</div>
+                            <span class="font-bold s-text-primary">통계 초기화</span>
+                        </div>
+                        <span class="s-text-muted">→</span>
+                    </button>
+                    <button onclick="openResetModal('all')" class="w-full flex items-center justify-between p-5 bg-white border border-red-100 rounded-2xl shadow-sm hover:bg-red-50 transition active:scale-95 group">
                         <div class="flex items-center gap-4">
                             <div class="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-red-500 group-hover:bg-red-100">🗑️</div>
-                            <span class="font-bold text-red-500">데이터 전체 초기화</span>
+                            <span class="font-bold text-red-500">전체 초기화</span>
                         </div>
                         <span class="text-red-300 group-hover:text-red-500">→</span>
                     </button>
@@ -289,6 +311,23 @@
             </button>
         </div>
         <div id="match-edit-list" class="p-4 space-y-3 overflow-y-auto flex-1"></div>
+    </div>
+</div>
+
+<!-- 데이터 초기화 시즌 선택 모달 -->
+<div id="reset-modal" class="hidden fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm" onclick="closeResetModal()">
+    <div class="w-full max-w-md mx-auto rounded-t-3xl shadow-2xl animate-slide-up" style="background-color:var(--bg-card);" onclick="event.stopPropagation()">
+        <div class="p-5 border-b flex items-center justify-between" style="border-color:var(--border)">
+            <div class="w-9"></div>
+            <h3 id="reset-modal-title" class="text-lg font-black s-text-primary">데이터 초기화</h3>
+            <button onclick="closeResetModal()" class="p-2 s-text-muted">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        <div class="p-5">
+            <p class="text-sm mb-4 s-text-secondary">삭제할 시즌을 선택하세요.</p>
+            <div id="reset-year-buttons" class="space-y-3"></div>
+        </div>
     </div>
 </div>
 
@@ -543,20 +582,63 @@
         }
     }
 
-    async function confirmResetAll() {
-        if (!confirm('⚠️ 경고: 모든 데이터(플레이어, 매치, 통계)가 영구 삭제됩니다.\n정말 진행하시겠습니까?')) return;
-        if (!confirm('정말로 모든 데이터를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다!')) return;
+    // ── 데이터 초기화 ────────────────────────────────
+    let resetTarget = null;
+    const RESET_LABELS = { players: '플레이어', matches: '매치', stats: '통계', all: '전체' };
+    const START_YEAR = 2026;
+
+    function openResetModal(target) {
+        if (target === 'players') {
+            confirmReset('players', null);
+            return;
+        }
+        resetTarget = target;
+        document.getElementById('reset-modal-title').textContent = `${RESET_LABELS[target]} 초기화`;
+        const container = document.getElementById('reset-year-buttons');
+        container.innerHTML = '';
+        const currentYear = new Date().getFullYear();
+        for (let y = currentYear; y >= START_YEAR; y--) {
+            const btn = document.createElement('button');
+            btn.className = 'w-full p-4 rounded-2xl font-bold text-sm transition active:scale-95 s-card';
+            btn.style.color = 'var(--text-primary)';
+            btn.textContent = `${y}년 시즌`;
+            btn.onclick = () => confirmReset(target, y);
+            container.appendChild(btn);
+        }
+        const allBtn = document.createElement('button');
+        allBtn.className = 'w-full p-4 rounded-2xl font-bold text-sm transition active:scale-95 border border-red-200 hover:bg-red-50';
+        allBtn.style.color = '#EF4444';
+        allBtn.textContent = '전체 데이터';
+        allBtn.onclick = () => confirmReset(target, null);
+        container.appendChild(allBtn);
+        document.getElementById('reset-modal').classList.remove('hidden');
+    }
+
+    function closeResetModal() { document.getElementById('reset-modal').classList.add('hidden'); }
+
+    async function confirmReset(table, year) {
+        const label = RESET_LABELS[table];
+        const yearLabel = year ? `${year}년` : '전체';
+        if (!confirm(`⚠️ ${label} ${yearLabel} 데이터가 영구 삭제됩니다.\n정말 진행하시겠습니까?`)) return;
+        if (!confirm(`정말로 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다!`)) return;
         try {
             const adminCode = AuthManager.getAdminCode();
-            const response = await fetch('/api/admin/reset-all', { method: 'DELETE', headers: { 'Authorization': adminCode } });
-            if (!response.ok) throw new Error('초기화 실패');
-            alert('모든 데이터가 삭제되었습니다.');
-            AuthManager.logout();
-            window.location.href = '/';
+            const body = { table, year };
+            const response = await fetch('/api/admin/reset', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json', 'Authorization': adminCode },
+                body: JSON.stringify(body)
+            });
+            if (!response.ok) throw new Error((await response.json()).detail || '초기화 실패');
+            const result = await response.json();
+            alert(result.message);
+            closeResetModal();
+            if (table === 'all' && !year) { AuthManager.logout(); window.location.href = '/'; }
         } catch (error) {
             alert('초기화 중 오류가 발생했습니다.');
         }
     }
+    // ─────────────────────────────────────────────────
 
     // ── 기록 수정 ─────────────────────────────────────
     async function showMatchEditModal() {
