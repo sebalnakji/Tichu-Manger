@@ -1,0 +1,28 @@
+# Web Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+
+# Database
+sqlalchemy==2.0.23
+psycopg2-binary==2.9.9  # PostgreSQL adapter
+
+# Pydantic (FastAPI 의존성, 명시적 추가)
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# Environment
+python-dotenv==1.0.0
+
+# Template Engine
+jinja2==3.1.2
+
+# Logging
+pyyaml==6.0.1
+
+# Storage (Supabase)
+supabase==2.12.0
+httpx==0.27.0
+
+# Utilities
+python-dateutil==2.8.2

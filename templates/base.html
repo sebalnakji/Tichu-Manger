@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>{% block title %}Tichu Manager{% endblock %}</title>
+
+    <!-- 테마 초기화: 깜빡임 방지를 위해 가장 먼저 실행 -->
+    <script>
+        (function() {
+            const theme = localStorage.getItem('tichu_theme') || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/styles.css">
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <main class="container mx-auto px-4 py-6">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% include 'auth_modal.html' %}
+
+    <script src="/static/js/app.js"></script>
+    <script src="/static/js/auth.js"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!-- 통합 인증 모달 -->
+<div id="auth-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
+        <h3 class="text-2xl font-bold mb-4 text-center text-gray-800">🔒 보안 코드 확인</h3>
+
+        <p class="text-gray-600 text-center mb-6">
+            핵심 기능(등록, 게임 진행)은<br>
+            등록된 유저만 가능합니다.
+        </p>
+
+        <!-- 코드 입력 -->
+        <div class="mb-4">
+            <div class="relative">
+                <input
+                    type="password"
+                    id="auth-code-input"
+                    class="w-full border-2 border-gray-300 rounded-lg px-4 py-3 pr-12 focus:outline-none focus:border-emerald-500 transition"
+                    placeholder="코드를 입력하세요"
+                    autocomplete="off"
+                >
+                <button
+                    type="button"
+                    id="toggle-password"
+                    class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    onclick="togglePasswordVisibility()"
+                >
+                    👁️
+                </button>
+            </div>
+            <p class="text-xs text-gray-500 mt-2">* 띄어쓰기 없는 정확한 코드</p>
+        </div>
+
+        <!-- 에러 메시지 -->
+        <div id="auth-error-message" class="hidden bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-lg mb-4 text-sm">
+        </div>
+
+        <!-- 버튼 -->
+        <div class="flex gap-3">
+            <button
+                onclick="AuthManager.closeAuthModal()"
+                class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-3 rounded-lg transition"
+            >
+                취소
+            </button>
+            <button
+                id="auth-confirm-btn"
+                class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 rounded-lg transition"
+            >
+                확인 (Go)
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 비밀번호 표시/숨김 토글
+    function togglePasswordVisibility() {
+        const input = document.getElementById('auth-code-input');
+        const type = input.type === 'password' ? 'text' : 'password';
+        input.type = type;
+    }
+
+    // 공백 입력 방지
+    document.addEventListener('DOMContentLoaded', () => {
+        const input = document.getElementById('auth-code-input');
+        if (input) {
+            AuthManager.preventSpace(input);
+        }
+    });
+</script>
+
+<style>
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        75% { transform: translateX(10px); }
+    }
+
+    .shake {
+        animation: shake 0.3s ease-in-out;
+    }
+</style>
