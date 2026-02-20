@@ -790,6 +790,22 @@
         const hasOneTwoEvent = events.some(e => e.type === 'one_two');
         if (teamABase === 0 && teamBBase === 0 && events.length === 0) { alert("점수나 이벤트를 입력해주세요."); return; }
         if (!hasOneTwoEvent && teamABase + teamBBase !== 100) { alert("원투가 아닐 경우 기본 점수 합계가 100점이어야 합니다."); return; }
+        for (const e of events) {
+            if (e.type === 'one_two' && !e.team) { alert("원투의 팀을 선택해주세요."); return; }
+            if (e.type !== 'one_two') {
+                if (!e.player_id) { alert(`${e.type === 'tichu' ? '티츄' : '라지'}의 플레이어를 선택해주세요.`); return; }
+                if (e.success === null) { alert(`${e.type === 'tichu' ? '티츄' : '라지'}의 성공/실패를 선택해주세요.`); return; }
+            }
+        }
+        const successEvents = events.filter(e => e.type !== 'one_two' && e.success === true);
+        if (successEvents.length > 1) { alert("티츄/라지 성공은 라운드당 1명만 가능합니다."); return; }
+        const oneTwoEvent = events.find(e => e.type === 'one_two' && e.team);
+        if (oneTwoEvent && successEvents.length > 0) {
+            const successPlayer = successEvents[0];
+            const isTeamA = matchData.team_a_ids.includes(successPlayer.player_id);
+            const successTeam = isTeamA ? 'A' : 'B';
+            if (successTeam !== oneTwoEvent.team) { alert(`${oneTwoEvent.team === 'A' ? 'TEAM A' : 'TEAM B'} 원투 시 상대팀은 티츄/라지를 성공할 수 없습니다.`); return; }
+        }
         const data = { round_number: currentRoundNumber, team_a_base_score: teamABase, team_b_base_score: teamBBase, events };
         try {
             const res = await fetch(`/api/matches/${matchId}/rounds`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
