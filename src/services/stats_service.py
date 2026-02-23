@@ -215,6 +215,8 @@ class StatsService:
             player2_id=player2.id,
             player1_name=player1.name,
             player2_name=player2.name,
+            player1_profile_url=player1.profile_url or '',
+            player2_profile_url=player2.profile_url or '',
             team_name=team_name,
             total_games=total_games,
             wins=wins,

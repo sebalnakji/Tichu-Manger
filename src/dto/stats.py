@@ -32,6 +32,8 @@ class TeamStats(BaseModel):
     player2_id: int
     player1_name: str
     player2_name: str
+    player1_profile_url: str
+    player2_profile_url: str
     team_name: str
     total_games: int
     wins: int
