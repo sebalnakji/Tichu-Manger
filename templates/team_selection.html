@@ -136,7 +136,7 @@
     .custom-scrollbar::-webkit-scrollbar-thumb { background-color: var(--scrollbar-color); border-radius: 20px; }
 </style>
 
-<div class="page-bg h-screen flex flex-col relative overflow-hidden">
+<div class="page-bg fixed inset-0 flex flex-col overflow-hidden">
     <div class="sticky top-0 z-40 ts-header shadow-sm transition-all duration-300">
         <div class="max-w-lg mx-auto px-4 py-2">
             <div class="flex items-center justify-between mb-2">
@@ -210,12 +210,9 @@
                     <div id="team-b-players" class="space-y-2"></div>
                 </div>
             </div>
-            <div class="p-4 result-modal-footer shrink-0 space-y-2">
+            <div class="p-4 result-modal-footer shrink-0">
                 <button id="start-game-btn" class="w-full start-btn font-bold py-4 rounded-xl text-lg shadow-lg flex items-center justify-center gap-2 active:scale-[0.98]">
                     <span>🚀 게임 시작하기</span>
-                </button>
-                <button onclick="assignTeams()" class="w-full font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition" style="background-color:var(--bg-card-sub); color:var(--text-secondary);">
-                    <span>🎲 팀 다시 배정</span>
                 </button>
             </div>
         </div>
