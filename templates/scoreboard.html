@@ -116,11 +116,7 @@
 
     .page-bg { background-color: var(--bg-main); }
 
-    /* 헤더 */
-    .sb-header {
-        background-color: var(--bg-card);
-        border-bottom: 1px solid var(--border);
-    }
+    .sb-header { background-color: var(--bg-card); border-bottom: 1px solid var(--border); }
     .sb-title { color: var(--text-primary); }
     .sb-back { color: var(--text-secondary); }
     .sb-back:hover { background-color: var(--bg-card-sub); }
@@ -135,46 +131,24 @@
     }
     .sb-exit-btn:hover { background-color: rgba(244,63,94,0.05); color: #F43F5E; border-color: rgba(244,63,94,0.3); }
 
-    /* 점수판 카드 */
+    /* 간략화된 점수판 카드 */
     .score-card {
         background-color: var(--bg-card);
         border: 1px solid var(--border);
-        border-radius: 1.5rem;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+        border-radius: 1.25rem;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.05);
         overflow: hidden;
     }
     .score-side-a { background: linear-gradient(to bottom, var(--team-a-bg), transparent); }
     .score-side-b { background: linear-gradient(to bottom, var(--team-b-bg), transparent); }
     .score-divider { background-color: var(--divider); }
-    .score-vs {
-        background-color: var(--bg-card);
-        border: 1px solid var(--border);
-        color: var(--text-muted);
-    }
     .team-a-label { color: var(--team-a-text); }
     .team-b-label { color: var(--team-b-text); }
     .team-a-score-val { color: var(--team-a-score); }
     .team-b-score-val { color: var(--team-b-score); }
-    .session-record { color: var(--text-primary); }
-    .season-rate-a {
-        color: var(--team-a-badge-text);
-        background-color: var(--team-a-badge-bg);
-        border: 1px solid var(--team-a-rate-border);
-    }
-    .season-rate-b {
-        color: var(--team-b-badge-text);
-        background-color: var(--team-b-badge-bg);
-        border: 1px solid var(--team-b-rate-border);
-    }
-
-    /* 플레이어 영역 */
-    .players-area {
-        background-color: var(--bg-card-sub);
-        border-top: 1px solid var(--divider);
-    }
-    .players-divider { border-color: var(--divider); }
-    .player-name { color: var(--text-primary); }
-    .player-stat { color: var(--text-muted); }
+    .season-rate-a { color: var(--team-a-badge-text); background-color: var(--team-a-badge-bg); }
+    .season-rate-b { color: var(--team-b-badge-text); background-color: var(--team-b-badge-bg); }
+    .session-record { color: var(--text-secondary); }
 
     /* 라운드 카드 */
     .section-label { color: var(--text-muted); }
@@ -182,7 +156,7 @@
         background-color: var(--round-card-bg);
         border: 1px solid var(--round-card-border);
         border-radius: 1rem;
-        padding: 1rem;
+        padding: 0.625rem 0.875rem;
         cursor: pointer;
         transition: background-color 0.15s;
     }
@@ -197,10 +171,7 @@
         color: var(--text-muted);
     }
 
-    /* 하단 버튼 */
-    .bottom-grad {
-        background: linear-gradient(to top, var(--bottom-grad-from) 60%, transparent);
-    }
+    .bottom-grad { background: linear-gradient(to top, var(--bottom-grad-from) 60%, transparent); }
     .add-round-btn {
         background-color: #10B981;
         color: white;
@@ -217,12 +188,10 @@
         display: flex; align-items: center; justify-content: center;
     }
 
-    /* 라운드 입력 모달 */
     .round-modal-wrap { background-color: var(--modal-bg); }
     .round-modal-header { border-bottom: 1px solid var(--modal-border); }
     .round-modal-title { color: var(--text-primary); }
     .round-modal-close { color: var(--text-muted); }
-    .round-modal-close:hover { color: var(--text-secondary); }
     .score-label-a { color: var(--team-a-badge-text); }
     .score-label-b { color: var(--team-b-badge-text); }
     .score-member-a { color: var(--team-a-score); }
@@ -257,136 +226,54 @@
     .score-input-b:focus { border-color: var(--team-b-score); }
     .score-slash { color: var(--text-muted); }
     .section-title { color: var(--text-muted); }
-    .event-btn-tichu {
-        background-color: var(--bg-card);
-        border: 2px solid rgba(234,179,8,0.2);
-        color: #A16207;
-        font-weight: 900;
-        border-radius: 0.75rem;
-        padding: 0.75rem;
-        transition: background-color 0.15s;
-    }
-    .event-btn-tichu:hover { background-color: rgba(234,179,8,0.08); }
-    .event-btn-grand {
-        background-color: var(--bg-card);
-        border: 2px solid rgba(147,51,234,0.2);
-        color: #7E22CE;
-        font-weight: 900;
-        border-radius: 0.75rem;
-        padding: 0.75rem;
-        transition: background-color 0.15s;
-    }
-    .event-btn-grand:hover { background-color: rgba(147,51,234,0.08); }
-    .event-btn-onetwo {
-        background-color: var(--bg-card);
-        border: 2px solid rgba(16,185,129,0.2);
-        color: #065F46;
-        font-weight: 900;
-        border-radius: 0.75rem;
-        padding: 0.75rem;
-        transition: background-color 0.15s;
-    }
-    .event-btn-onetwo:hover { background-color: rgba(16,185,129,0.08); }
-    .event-card {
-        background-color: var(--event-card-bg);
-        border: 1px solid var(--event-card-border);
-        border-radius: 0.75rem;
-        padding: 0.75rem;
-    }
+    .event-btn-tichu { background-color: var(--bg-card); border: 2px solid rgba(234,179,8,0.2); color: #A16207; font-weight: 900; border-radius: 0.75rem; padding: 0.75rem; transition: background-color 0.15s; }
+    .event-btn-grand { background-color: var(--bg-card); border: 2px solid rgba(147,51,234,0.2); color: #7E22CE; font-weight: 900; border-radius: 0.75rem; padding: 0.75rem; transition: background-color 0.15s; }
+    .event-btn-onetwo { background-color: var(--bg-card); border: 2px solid rgba(16,185,129,0.2); color: #065F46; font-weight: 900; border-radius: 0.75rem; padding: 0.75rem; transition: background-color 0.15s; }
+    .event-card { background-color: var(--event-card-bg); border: 1px solid var(--event-card-border); border-radius: 0.75rem; padding: 0.75rem; }
     .event-empty { color: var(--text-muted); border: 1px dashed var(--round-empty-border); border-radius: 0.75rem; }
     .event-delete { color: var(--text-muted); font-size: 0.75rem; font-weight: 700; }
     .event-delete:hover { color: #F43F5E; }
     .event-toggle-default { background-color: var(--bg-card); color: var(--text-primary); }
-
-    .modal-footer {
-        background-color: var(--modal-footer-bg);
-        border-top: 1px solid var(--modal-border);
-    }
+    .modal-footer { background-color: var(--modal-footer-bg); border-top: 1px solid var(--modal-border); }
     .preview-a { color: var(--team-a-score); font-weight: 700; }
     .preview-b { color: var(--team-b-score); font-weight: 700; }
-    .preview-divider { color: var(--divider); }
-    .delete-btn {
-        background-color: var(--bg-card-sub);
-        color: var(--text-muted);
-        border-radius: 0.75rem;
-        font-weight: 700;
-        padding: 1rem;
-        transition: all 0.15s;
-    }
+    .delete-btn { background-color: var(--bg-card-sub); color: var(--text-muted); border-radius: 0.75rem; font-weight: 700; padding: 1rem; transition: all 0.15s; }
     .delete-btn:hover { background-color: rgba(244,63,94,0.1); color: #F43F5E; }
-    .save-btn {
-        background-color: #10B981;
-        color: white;
-        border-radius: 0.75rem;
-        font-weight: 700;
-        padding: 1rem;
-        flex: 1;
-        box-shadow: 0 4px 12px rgba(16,185,129,0.3);
-        transition: background-color 0.2s, transform 0.15s;
-    }
+    .save-btn { background-color: #10B981; color: white; border-radius: 0.75rem; font-weight: 700; padding: 1rem; flex: 1; box-shadow: 0 4px 12px rgba(16,185,129,0.3); transition: background-color 0.2s, transform 0.15s; }
     .save-btn:hover { background-color: #059669; }
     .save-btn:active { transform: scale(0.98); }
 
-    /* 승리 모달 */
     .victory-modal-wrap { background-color: var(--victory-bg); }
     .victory-top { background: linear-gradient(to bottom, var(--victory-top), transparent); }
     .victory-title { color: var(--text-primary); }
-    .victory-inner {
-        background-color: var(--bg-card);
-        border: 2px solid rgba(234,179,8,0.15);
-        border-radius: 1rem;
-    }
+    .victory-inner { background-color: var(--bg-card); border: 2px solid rgba(234,179,8,0.15); border-radius: 1rem; }
     .victory-divider { border-color: var(--divider); }
     .victory-sub { color: var(--text-muted); }
     .victory-record { color: var(--text-primary); }
-    .victory-btn-main {
-        background-color: #10B981;
-        color: white;
-        border-radius: 0.75rem;
-        font-weight: 700;
-        padding: 0.875rem;
-        width: 100%;
-        transition: background-color 0.2s;
-    }
+    .victory-btn-main { background-color: #10B981; color: white; border-radius: 0.75rem; font-weight: 700; padding: 0.875rem; width: 100%; transition: background-color 0.2s; }
     .victory-btn-main:hover { background-color: #059669; }
-    .victory-btn-sub {
-        background-color: var(--bg-card-sub);
-        color: var(--text-secondary);
-        border-radius: 0.75rem;
-        font-weight: 700;
-        padding: 0.875rem;
-        flex: 1;
-        transition: background-color 0.15s;
-    }
+    .victory-btn-sub { background-color: var(--bg-card-sub); color: var(--text-secondary); border-radius: 0.75rem; font-weight: 700; padding: 0.875rem; flex: 1; transition: background-color 0.15s; }
     .victory-btn-sub:hover { background-color: var(--bg-main); }
 
-    /* 종료 모달 */
     .exit-modal-wrap { background-color: var(--modal-bg); }
     .exit-title { color: var(--text-primary); }
     .exit-desc { color: var(--text-muted); }
-    .exit-btn {
-        width: 100%;
-        font-weight: 700;
-        padding: 0.75rem 1rem;
-        border-radius: 0.75rem;
-        text-align: left;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        transition: background-color 0.15s;
-    }
+    .exit-btn { width: 100%; font-weight: 700; padding: 0.75rem 1rem; border-radius: 0.75rem; text-align: left; display: flex; align-items: center; gap: 0.75rem; transition: background-color 0.15s; }
     .exit-cancel { color: var(--text-muted); font-weight: 700; padding: 0.75rem; width: 100%; transition: color 0.15s; }
-    .exit-cancel:hover { color: var(--text-secondary); }
 
-    .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background-color: var(--scrollbar-color); border-radius: 20px; }
+    /* 슬라이더 트랙 색상 */
+    input[type=range]#slider-a { background: linear-gradient(to right, rgba(79,70,229,0.35) 0%, rgba(79,70,229,0.35) 50%, rgba(79,70,229,0.15) 50%, rgba(79,70,229,0.15) 100%); }
+    input[type=range]#slider-b { background: linear-gradient(to right, rgba(244,63,94,0.35) 0%, rgba(244,63,94,0.35) 50%, rgba(244,63,94,0.15) 50%, rgba(244,63,94,0.15) 100%); }
+    input[type=range]:disabled { opacity: 0.3; }
+
+    /* 입력 패널 구분 강조 */
+    #input-panel { box-shadow: 0 -4px 20px rgba(0,0,0,0.08); }
 </style>
 
 <div class="page-bg fixed inset-0 flex flex-col overflow-hidden">
 
-    <!-- 헤더 -->
-    <div class="sticky top-0 z-40 sb-header shadow-sm">
+    <!-- 최상단 헤더 -->
+    <div class="sb-header shadow-sm shrink-0">
         <div class="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
             <a href="/" class="p-2 -ml-2 rounded-full transition sb-back">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -398,115 +285,86 @@
         </div>
     </div>
 
-    <div class="flex-1 max-w-lg mx-auto w-full px-4 pt-6 pb-32 overflow-y-auto">
-
-        <!-- 점수판 카드 -->
-        <div class="score-card mb-8">
-            <div class="flex items-stretch" style="border-bottom: 1px solid var(--divider);">
-                <div class="flex-1 p-6 flex flex-col items-center justify-center score-side-a">
-                    <h3 class="text-sm font-black mb-1 tracking-wide team-a-label">TEAM A</h3>
-                    <p id="team-a-score" class="text-5xl font-black tracking-tighter leading-none team-a-score-val">0</p>
-                    <div class="mt-3 text-center flex flex-col items-center gap-1">
-                        <p id="team-a-session-record" class="text-sm font-bold session-record">0승 0패</p>
-                        <span id="team-a-season-rate" class="text-[10px] font-bold px-2 py-0.5 rounded-full season-rate-a">시즌 승률 -%</span>
+    <!-- 상단: 고정 점수판 -->
+    <div class="shrink-0 max-w-lg mx-auto w-full px-4 pt-4 pb-3">
+        <div class="score-card">
+            <div class="flex items-stretch">
+                <!-- TEAM A -->
+                <div class="flex-1 px-4 py-4 flex flex-col items-center justify-center gap-1.5 score-side-a">
+                    <div class="flex items-center gap-1.5">
+                        <p class="text-xs font-black tracking-widest team-a-label">TEAM A</p>
+                        <p class="text-xs truncate" style="color:var(--text-muted)" id="team-a-names"></p>
+                    </div>
+                    <p id="team-a-score" class="text-4xl font-black tracking-tighter leading-none team-a-score-val">0</p>
+                    <div class="flex items-center gap-1.5">
+                        <p id="team-a-session-record" class="text-xs font-bold session-record">0승 0패</p>
+                        <span id="team-a-season-rate" class="text-[10px] font-bold px-2 py-0.5 rounded-full season-rate-a">시즌 0%</span>
                     </div>
                 </div>
-
+                <!-- 구분선 + VS -->
                 <div class="score-divider relative flex items-center justify-center" style="width:1px;">
-                    <div class="absolute score-vs text-[10px] font-black px-2 py-1 rounded-full shadow-sm z-10">VS</div>
+                    <div class="absolute text-[10px] font-black px-1.5 py-0.5 rounded-full shadow-sm z-10" style="background-color:var(--bg-card); border:1px solid var(--border); color:var(--text-muted);">VS</div>
                 </div>
-
-                <div class="flex-1 p-6 flex flex-col items-center justify-center score-side-b">
-                    <h3 class="text-sm font-black mb-1 tracking-wide team-b-label">TEAM B</h3>
-                    <p id="team-b-score" class="text-5xl font-black tracking-tighter leading-none team-b-score-val">0</p>
-                    <div class="mt-3 text-center flex flex-col items-center gap-1">
-                        <p id="team-b-session-record" class="text-sm font-bold session-record">0승 0패</p>
-                        <span id="team-b-season-rate" class="text-[10px] font-bold px-2 py-0.5 rounded-full season-rate-b">시즌 승률 -%</span>
+                <!-- TEAM B -->
+                <div class="flex-1 px-4 py-4 flex flex-col items-center justify-center gap-1.5 score-side-b">
+                    <div class="flex items-center gap-1.5">
+                        <p class="text-xs font-black tracking-widest team-b-label">TEAM B</p>
+                        <p class="text-xs truncate" style="color:var(--text-muted)" id="team-b-names"></p>
+                    </div>
+                    <p id="team-b-score" class="text-4xl font-black tracking-tighter leading-none team-b-score-val">0</p>
+                    <div class="flex items-center gap-1.5">
+                        <p id="team-b-session-record" class="text-xs font-bold session-record">0승 0패</p>
+                        <span id="team-b-season-rate" class="text-[10px] font-bold px-2 py-0.5 rounded-full season-rate-b">시즌 0%</span>
                     </div>
                 </div>
             </div>
-
-            <div class="players-area grid grid-cols-2">
-                <div id="team-a-players" class="p-4 space-y-3 players-divider" style="border-right: 1px solid var(--divider);"></div>
-                <div id="team-b-players" class="p-4 space-y-3"></div>
-            </div>
-        </div>
-
-        <!-- 라운드 기록 -->
-        <div class="mb-4">
-            <h3 class="text-xs font-bold uppercase tracking-wider mb-3 px-1 section-label">라운드 기록</h3>
-            <div id="rounds-container" class="space-y-3"></div>
         </div>
     </div>
 
-    <!-- 하단 버튼 -->
-    <div class="fixed bottom-0 left-0 right-0 z-30 bottom-grad pt-8 pb-6 px-4">
-        <div class="max-w-lg mx-auto">
-            <button id="add-round-btn" class="add-round-btn w-full h-16 flex items-center justify-center gap-2 touch-manipulation">
-                <div class="add-round-icon">＋</div>
-                <span class="text-lg font-bold">점수 입력하기</span>
-            </button>
-        </div>
+    <!-- 중단: 라운드 기록 (스크롤) -->
+    <div class="flex-1 overflow-y-auto max-w-lg mx-auto w-full px-4">
+        <h3 class="text-xs font-bold uppercase tracking-wider mb-3 px-1 section-label">라운드 기록</h3>
+        <div id="rounds-container" class="space-y-3 pb-6"></div>
     </div>
-</div>
 
-<!-- 라운드 입력 모달 -->
-<div id="round-modal" class="hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm">
-    <div class="round-modal-wrap rounded-t-3xl sm:rounded-3xl shadow-2xl w-full max-w-lg mx-auto overflow-hidden max-h-[95vh] flex flex-col">
-        <div class="round-modal-header px-6 py-4 flex justify-between items-center shrink-0">
-            <h3 class="text-lg font-black round-modal-title"><span id="modal-title">라운드 점수</span></h3>
-            <button onclick="closeRoundModal()" class="p-2 -mr-2 round-modal-close">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-            </button>
-        </div>
+    <!-- 하단 점수 입력 패널 -->
+    <div id="input-panel" class="shrink-0 max-w-lg mx-auto w-full" style="background-color:var(--bg-main); border-top: 2px solid var(--border);">
 
-        <div class="p-6 space-y-8 overflow-y-auto custom-scrollbar flex-1">
-            <div>
-                <div class="flex justify-between items-end mb-4">
-                    <h4 class="text-sm font-bold uppercase section-title">기본 점수</h4>
-                    <span class="text-xs" style="color: var(--text-muted);">합계 100점</span>
-                </div>
-                <div class="flex items-center gap-4">
-                    <div class="flex-1">
-                        <div class="text-center mb-2">
-                            <label class="block text-xs font-bold score-label-a">TEAM A</label>
-                            <p id="modal-team-a-members" class="text-[10px] score-member-a truncate"></p>
-                        </div>
-                        <input type="number" id="team-a-base-score" class="score-input-a" placeholder="0" inputmode="numeric" oninput="handleScoreInput('A')">
+        <!-- 태그 영역 -->
+        <div id="event-tags" class="hidden px-4 pt-2 flex flex-wrap gap-1"></div>
+
+        <div class="px-4 pt-3 pb-safe" style="background-color:var(--bg-main);">
+            <!-- 점수 슬라이더 -->
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-[10px] font-black" style="color:var(--team-a-score)">TEAM A</span>
+                        <span id="slider-a-val" class="text-sm font-black" style="color:var(--team-a-score)">50</span>
                     </div>
-                    <div class="text-2xl font-light self-end mb-4 score-slash">/</div>
-                    <div class="flex-1">
-                        <div class="text-center mb-2">
-                            <label class="block text-xs font-bold score-label-b">TEAM B</label>
-                            <p id="modal-team-b-members" class="text-[10px] score-member-b truncate"></p>
-                        </div>
-                        <input type="number" id="team-b-base-score" class="score-input-b" placeholder="0" inputmode="numeric" oninput="handleScoreInput('B')">
+                    <input type="range" id="slider-a" min="-25" max="125" step="5" value="50"
+                        class="w-full h-2 rounded-full appearance-none cursor-pointer"
+                        style="accent-color:var(--team-a-score);"
+                        oninput="onSliderA()">
+                </div>
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-[10px] font-black" style="color:var(--team-b-score)">TEAM B</span>
+                        <span id="slider-b-val" class="text-sm font-black" style="color:var(--team-b-score)">50</span>
                     </div>
+                    <input type="range" id="slider-b" min="-25" max="125" step="5" value="50"
+                        class="w-full h-2 rounded-full appearance-none cursor-pointer"
+                        style="accent-color:var(--team-b-score);"
+                        oninput="onSliderB()">
                 </div>
             </div>
 
-            <div>
-                <h4 class="text-sm font-bold uppercase mb-3 section-title">특수 이벤트</h4>
-                <div class="grid grid-cols-3 gap-3 mb-4">
-                    <button onclick="addEvent('tichu')" class="event-btn-tichu">티츄</button>
-                    <button onclick="addEvent('grand')" class="event-btn-grand">라지</button>
-                    <button onclick="addEvent('one_two')" class="event-btn-onetwo">원투</button>
-                </div>
-                <div id="events-container" class="space-y-3"></div>
-            </div>
-        </div>
+            <!-- 이벤트 버튼 그리드 -->
+            <div id="event-btn-grid" class="mb-3"></div>
 
-        <div class="modal-footer p-4 shrink-0 space-y-3">
-            <div class="flex justify-between items-center px-2 text-sm">
-                <div class="preview-a">A: <span id="preview-team-a" class="text-lg">0</span></div>
-                <div class="preview-divider">|</div>
-                <div class="preview-b">B: <span id="preview-team-b" class="text-lg">0</span></div>
-            </div>
-            <div class="flex gap-2">
-                <button id="delete-round-btn" onclick="deleteRound()" class="hidden delete-btn w-20">삭제</button>
-                <button onclick="saveRound()" class="save-btn">저장하기</button>
+            <!-- 초기화 / 저장 -->
+            <div class="flex gap-2 pb-4">
+                <button onclick="resetInput()" class="flex-none text-sm font-bold py-3 px-4 rounded-xl transition" style="background-color:var(--bg-card-sub); color:var(--text-muted);">초기화</button>
+                <button onclick="saveRound()" class="flex-1 text-sm font-bold py-3 rounded-xl text-white transition" style="background-color:#10B981; box-shadow:0 4px 12px rgba(16,185,129,0.3);">저장하기</button>
             </div>
         </div>
     </div>
@@ -584,19 +442,13 @@
     document.addEventListener('DOMContentLoaded', () => {
         initSessionStats();
         loadMatchData();
-        document.getElementById('add-round-btn').addEventListener('click', () => openRoundModal(null));
         document.getElementById('exit-game-btn').addEventListener('click', showExitModal);
     });
 
     function initSessionStats() {
-        if (document.referrer.includes('team-selection')) {
-            sessionStorage.removeItem(SESSION_KEY);
-        }
+        if (document.referrer.includes('team-selection')) sessionStorage.removeItem(SESSION_KEY);
         let stats = JSON.parse(sessionStorage.getItem(SESSION_KEY));
-        if (!stats) {
-            stats = { team_a_wins: 0, team_b_wins: 0, total_games: 0 };
-            sessionStorage.setItem(SESSION_KEY, JSON.stringify(stats));
-        }
+        if (!stats) { stats = { team_a_wins: 0, team_b_wins: 0, total_games: 0 }; sessionStorage.setItem(SESSION_KEY, JSON.stringify(stats)); }
     }
 
     async function loadMatchData() {
@@ -605,38 +457,188 @@
             matchData = await response.json();
             renderTeamInfo();
             renderRounds();
+            initInputPanel();
+            renderEventBtnGrid();
         } catch (error) { console.error('Error:', error); }
     }
 
     function renderTeamInfo() {
         document.getElementById('team-a-score').textContent = matchData.team_a_total_score;
         document.getElementById('team-b-score').textContent = matchData.team_b_total_score;
-
+        document.getElementById('team-a-names').textContent = matchData.team_a_players.map(p => p.name).join(' · ');
+        document.getElementById('team-b-names').textContent = matchData.team_b_players.map(p => p.name).join(' · ');
         const stats = JSON.parse(sessionStorage.getItem(SESSION_KEY));
         document.getElementById('team-a-session-record').textContent = `${stats.team_a_wins}승 ${stats.team_b_wins}패`;
         document.getElementById('team-b-session-record').textContent = `${stats.team_b_wins}승 ${stats.team_a_wins}패`;
+        const aRate = matchData.team_a_team_win_rate ?? 0;
+        const bRate = matchData.team_b_team_win_rate ?? 0;
+        document.getElementById('team-a-season-rate').textContent = `시즌 ${aRate}%`;
+        document.getElementById('team-b-season-rate').textContent = `시즌 ${bRate}%`;
+    }
 
-        const aRate = matchData.team_a_team_win_rate !== undefined ? matchData.team_a_team_win_rate : 0;
-        const bRate = matchData.team_b_team_win_rate !== undefined ? matchData.team_b_team_win_rate : 0;
-        document.getElementById('team-a-season-rate').textContent = `시즌 승률 ${aRate}%`;
-        document.getElementById('team-b-season-rate').textContent = `시즌 승률 ${bRate}%`;
+    // ── 입력 패널 초기화 ──
+    function initInputPanel() {
+        currentRoundNumber = matchData.rounds.length > 0 ? Math.max(...matchData.rounds.map(r => r.round_number)) + 1 : 1;
+        events = [];
+        setSliders(50, 50, false);
+        renderEventBtnGrid();
+        renderTags();
+    }
 
-        const renderPlayers = (containerId, players) => {
-            const container = document.getElementById(containerId);
-            container.innerHTML = '';
-            players.forEach(p => {
-                container.innerHTML += `
-                    <div class="flex items-center gap-3">
-                        <img src="${p.profile_url}" class="w-8 h-8 rounded-full object-cover" style="border: 1px solid var(--border);">
-                        <div>
-                            <span class="font-bold text-sm block player-name">${p.name}</span>
-                            <span class="text-[10px] block player-stat">시즌 ${p.win_rate}% | 최근 ${p.recent_win_rate}%</span>
-                        </div>
-                    </div>`;
-            });
-        };
-        renderPlayers('team-a-players', matchData.team_a_players);
-        renderPlayers('team-b-players', matchData.team_b_players);
+    function loadRoundToPanel(n) {
+        currentRoundNumber = n;
+        const round = matchData.rounds.find(r => r.round_number === n);
+        events = JSON.parse(JSON.stringify(round.events)).map(e => {
+            // key 재구성
+            if (e.type === 'one_two') e.key = `ot-${e.team}`;
+            else {
+                const teamPrefix = matchData.team_a_ids.includes(e.player_id) ? 'a' : 'b';
+                const typeStr = e.type === 'tichu' ? 'tichu' : 'grand';
+                const successStr = e.success ? 's' : 'f';
+                e.key = `${teamPrefix}-${e.player_id}-${typeStr}-${successStr}`;
+            }
+            return e;
+        });
+        const hasOT = events.some(e => e.type === 'one_two');
+        setSliders(round.team_a_base_score, round.team_b_base_score, hasOT);
+        renderEventBtnGrid();
+        renderTags();
+    }
+
+    function setSliders(a, b, disabled) {
+        const sa = document.getElementById('slider-a'), sb = document.getElementById('slider-b');
+        sa.value = a; sb.value = b;
+        sa.disabled = disabled; sb.disabled = disabled;
+        sa.style.opacity = disabled ? '0.4' : '1';
+        sb.style.opacity = disabled ? '0.4' : '1';
+        document.getElementById('slider-a-val').textContent = a;
+        document.getElementById('slider-b-val').textContent = b;
+    }
+
+    function onSliderA() {
+        const a = parseInt(document.getElementById('slider-a').value);
+        const b = 100 - a;
+        document.getElementById('slider-b').value = Math.max(-25, Math.min(125, b));
+        document.getElementById('slider-a-val').textContent = a;
+        document.getElementById('slider-b-val').textContent = Math.max(-25, Math.min(125, b));
+    }
+
+    function onSliderB() {
+        const b = parseInt(document.getElementById('slider-b').value);
+        const a = 100 - b;
+        document.getElementById('slider-a').value = Math.max(-25, Math.min(125, a));
+        document.getElementById('slider-b-val').textContent = b;
+        document.getElementById('slider-a-val').textContent = Math.max(-25, Math.min(125, a));
+    }
+
+    // ── 이벤트 버튼 그리드 렌더링 ──
+    function renderEventBtnGrid() {
+        const grid = document.getElementById('event-btn-grid');
+        if (!grid || !matchData) return;
+
+        const aPlayers = matchData.team_a_players; // 2명
+        const bPlayers = matchData.team_b_players; // 2명
+
+        // 2행 9열 구조
+        // 행1(성공): A1 T✅, A1 L✅, A2 T✅, A2 L✅, A팀원투, B1 T✅, B1 L✅, B2 T✅, B2 L✅
+        // 행2(실패): A1 T❌, A1 L❌, A2 T❌, A2 L❌, B팀원투, B1 T❌, B1 L❌, B2 T❌, B2 L❌
+
+        const mkKey = (team, pid, type, suf) => `${team}-${pid}-${type}-${suf}`;
+
+        const row1 = [
+            ...aPlayers.flatMap(p => [
+                { key: mkKey('a',p.id,'tichu','s'), label:`${p.name} T`, type:'tichu', player_id:p.id, success:true,  team:null, success_icon:'✅', textColor:'#92400E', activeBg:'#FEF3C7', borderColor:'rgba(234,179,8,0.5)' },
+                { key: mkKey('a',p.id,'grand','s'), label:`${p.name} L`, type:'grand', player_id:p.id, success:true,  team:null, success_icon:'✅', textColor:'#6D28D9', activeBg:'#EDE9FE', borderColor:'rgba(139,92,246,0.5)' },
+            ]),
+            { key:'ot-A', label:'A팀\n원투', type:'one_two', player_id:null, success:null, team:'A', success_icon:'', textColor:'#4F46E5', activeBg:'#D1FAE5', borderColor:'rgba(16,185,129,0.5)' },
+            ...bPlayers.flatMap(p => [
+                { key: mkKey('b',p.id,'tichu','s'), label:`${p.name} T`, type:'tichu', player_id:p.id, success:true,  team:null, success_icon:'✅', textColor:'#92400E', activeBg:'#FEF3C7', borderColor:'rgba(234,179,8,0.5)' },
+                { key: mkKey('b',p.id,'grand','s'), label:`${p.name} L`, type:'grand', player_id:p.id, success:true,  team:null, success_icon:'✅', textColor:'#6D28D9', activeBg:'#EDE9FE', borderColor:'rgba(139,92,246,0.5)' },
+            ]),
+        ];
+
+        const row2 = [
+            ...aPlayers.flatMap(p => [
+                { key: mkKey('a',p.id,'tichu','f'), label:`${p.name} T`, type:'tichu', player_id:p.id, success:false, team:null, success_icon:'❌', textColor:'#991B1B', activeBg:'#FEE2E2', borderColor:'rgba(239,68,68,0.4)' },
+                { key: mkKey('a',p.id,'grand','f'), label:`${p.name} L`, type:'grand', player_id:p.id, success:false, team:null, success_icon:'❌', textColor:'#991B1B', activeBg:'#FEE2E2', borderColor:'rgba(239,68,68,0.4)' },
+            ]),
+            { key:'ot-B', label:'B팀\n원투', type:'one_two', player_id:null, success:null, team:'B', success_icon:'', textColor:'#F43F5E', activeBg:'#D1FAE5', borderColor:'rgba(16,185,129,0.5)' },
+            ...bPlayers.flatMap(p => [
+                { key: mkKey('b',p.id,'tichu','f'), label:`${p.name} T`, type:'tichu', player_id:p.id, success:false, team:null, success_icon:'❌', textColor:'#991B1B', activeBg:'#FEE2E2', borderColor:'rgba(239,68,68,0.4)' },
+                { key: mkKey('b',p.id,'grand','f'), label:`${p.name} L`, type:'grand', player_id:p.id, success:false, team:null, success_icon:'❌', textColor:'#991B1B', activeBg:'#FEE2E2', borderColor:'rgba(239,68,68,0.4)' },
+            ]),
+        ];
+
+        grid.innerHTML = '';
+        grid.style.display = 'grid';
+        grid.style.gridTemplateColumns = 'repeat(9, 1fr)';
+        grid.style.gridTemplateRows = 'repeat(2, auto)';
+        grid.style.gap = '4px';
+
+        [...row1, ...row2].forEach(def => {
+            const isActive = events.some(e => e.key === def.key);
+            const btn = document.createElement('button');
+            btn.id = `evbtn-${def.key}`;
+            btn.className = 'text-[10px] font-bold py-1.5 rounded-lg border-2 transition leading-tight';
+            btn.style.cssText = isActive
+                ? `background-color:${def.activeBg}; color:${def.textColor}; border-color:${def.borderColor};`
+                : `background-color:var(--bg-card); color:${def.textColor}; border-color:${def.borderColor};`;
+            btn.innerHTML = def.success_icon
+                ? `${def.label}<br><span>${def.success_icon}</span>`
+                : def.label.replace('\n','<br>');
+            btn.onclick = () => toggleEvent(def);
+            grid.appendChild(btn);
+        });
+    }
+
+    function toggleEvent(def) {
+        const idx = events.findIndex(e => e.key === def.key);
+        if (idx !== -1) {
+            // 이미 있으면 제거
+            const type = events[idx].type;
+            events.splice(idx, 1);
+            if (type === 'one_two' && !events.some(e => e.type === 'one_two')) setSliders(50, 50, false);
+        } else {
+            // 원투면 기존 원투 제거 후 추가
+            if (def.type === 'one_two') {
+                events = events.filter(e => e.type !== 'one_two');
+                setSliders(0, 0, true);
+            }
+            events.push({ key: def.key, type: def.type, player_id: def.player_id, success: def.success, team: def.team });
+        }
+        renderEventBtnGrid();
+        renderTags();
+    }
+
+    function renderTags() {
+        const container = document.getElementById('event-tags');
+        if (events.length === 0) { container.classList.add('hidden'); container.innerHTML = ''; return; }
+        container.classList.remove('hidden');
+        container.innerHTML = '';
+        events.forEach((e, i) => {
+            const p = [...(matchData?.team_a_players || []), ...(matchData?.team_b_players || [])].find(x => x.id === e.player_id);
+            let text = e.type === 'one_two' ? `${e.team === 'A' ? 'A팀' : 'B팀'} 원투`
+                : `${p ? p.name : ''} ${e.type === 'tichu' ? 'T' : 'L'} ${e.success ? '✅' : '❌'}`;
+            let bg, color;
+            if (e.type === 'one_two' && e.team === 'A') { bg = '#CCFBF1'; color = '#065F46'; }
+            else if (e.type === 'one_two' && e.team === 'B') { bg = '#FEF2F2'; color = '#7F1D1D'; }
+            else if (e.type === 'tichu' && e.success) { bg = '#FEF3C7'; color = '#92400E'; }
+            else if (e.type === 'grand' && e.success) { bg = '#EDE9FE'; color = '#6D28D9'; }
+            else { bg = '#FEE2E2'; color = '#991B1B'; }
+            const tag = document.createElement('span');
+            tag.className = 'text-xs font-bold px-2 py-0.5 rounded-lg flex items-center gap-1';
+            tag.style.cssText = `background-color:${bg}; color:${color};`;
+            tag.innerHTML = `${text} <button onclick="removeEventByIndex(${i})" style="opacity:0.6; font-size:0.75rem; line-height:1;">✕</button>`;
+            container.appendChild(tag);
+        });
+    }
+
+    function removeEventByIndex(i) {
+        const type = events[i].type;
+        events.splice(i, 1);
+        if (type === 'one_two' && !events.some(e => e.type === 'one_two')) setSliders(50, 50, false);
+        renderEventBtnGrid();
+        renderTags();
     }
 
     function renderRounds() {
@@ -649,181 +651,78 @@
         [...matchData.rounds].sort((a, b) => a.round_number - b.round_number).forEach(round => {
             const div = document.createElement('div');
             div.className = 'round-card';
-            div.onclick = () => openRoundModal(round.round_number);
             let eventBadges = '';
             round.events.forEach(e => {
                 const p = [...matchData.team_a_players, ...matchData.team_b_players].find(x => x.id === e.player_id);
-                let badgeClass = e.type === 'one_two' ? 'bg-emerald-100 text-emerald-700' : (e.success ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-700');
-                if (e.type === 'tichu' && e.success) badgeClass = 'bg-yellow-100 text-yellow-700';
-                if (e.type === 'grand' && e.success) badgeClass = 'bg-emerald-100 text-emerald-700';
-                let text = e.type === 'one_two' ? `${e.team} 원투` : `${p ? p.name : ''} ${e.type === 'tichu' ? '티츄' : '라지'} ${e.success ? '성공' : '실패'}`;
-                eventBadges += `<span class="text-xs font-bold px-2 py-1 rounded-lg ${badgeClass} ml-1">${text}</span>`;
+                let badgeClass;
+                if (e.type === 'one_two') badgeClass = 'bg-emerald-100 text-emerald-700';
+                else if (e.type === 'tichu' && e.success) badgeClass = 'bg-yellow-100 text-yellow-700';
+                else if (e.type === 'grand' && e.success) badgeClass = 'bg-violet-100 text-violet-700';
+                else badgeClass = 'bg-red-100 text-red-700';
+                let text = e.type === 'one_two' ? `${e.team === 'A' ? 'A팀' : 'B팀'} 원투` : `${p ? p.name : ''} ${e.type === 'tichu' ? '티츄' : '라지'} ${e.success ? '성공' : '실패'}`;
+                eventBadges += `<span class="text-xs font-bold px-2 py-0.5 rounded-lg ${badgeClass}">${text}</span>`;
             });
             div.innerHTML = `
-                <div class="flex justify-between items-center mb-1">
+                <div class="relative">
                     <span class="text-xs font-bold round-label">ROUND ${round.round_number}</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <div class="flex items-center gap-3">
+                    <button onclick="loadRoundToPanel(${round.round_number})" class="absolute right-0 top-0 text-[10px] font-bold px-2 py-0.5 rounded-full transition" style="background-color:var(--bg-card-sub); color:var(--text-muted);">수정</button>
+                    <div class="flex justify-center items-center gap-3 -mt-4">
                         <span class="text-2xl font-black round-score-a">${round.team_a_total}</span>
-                        <span style="color: var(--divider);">:</span>
+                        <span style="color:var(--text-muted); font-size:0.75rem;">vs</span>
                         <span class="text-2xl font-black round-score-b">${round.team_b_total}</span>
                     </div>
-                    <div class="flex flex-wrap justify-end gap-1">${eventBadges}</div>
-                </div>`;
+                </div>
+                ${eventBadges ? `<div class="flex flex-wrap gap-1 mt-1">${eventBadges}</div>` : ''}`;
             container.appendChild(div);
         });
     }
 
-    function openRoundModal(n) {
-        currentRoundNumber = n || (matchData.rounds.length > 0 ? Math.max(...matchData.rounds.map(r => r.round_number)) + 1 : 1);
-        events = n ? JSON.parse(JSON.stringify(matchData.rounds.find(r => r.round_number === n).events)) : [];
+    function removeEvent(i) { removeEventByIndex(i); }
 
-        document.getElementById('modal-team-a-members').textContent = matchData.team_a_players.map(p => p.name).join(', ');
-        document.getElementById('modal-team-b-members').textContent = matchData.team_b_players.map(p => p.name).join(', ');
-        document.getElementById('modal-title').textContent = `라운드 ${currentRoundNumber}`;
-
-        const round = matchData.rounds.find(r => r.round_number === n);
-        document.getElementById('team-a-base-score').value = round ? round.team_a_base_score : 0;
-        document.getElementById('team-b-base-score').value = round ? round.team_b_base_score : 0;
-
-        const hasOT = events.some(e => e.type === 'one_two');
-        document.getElementById('team-a-base-score').disabled = hasOT;
-        document.getElementById('team-b-base-score').disabled = hasOT;
-
-        const deleteBtn = document.getElementById('delete-round-btn');
-        n === null ? deleteBtn.classList.add('hidden') : deleteBtn.classList.remove('hidden');
-
-        renderEvents(); updatePreview();
-        document.getElementById('round-modal').classList.remove('hidden');
-    }
-
-    function closeRoundModal() { document.getElementById('round-modal').classList.add('hidden'); }
-
-    function handleScoreInput(team) {
-        const a = document.getElementById('team-a-base-score'), b = document.getElementById('team-b-base-score');
-        if (events.some(e => e.type === 'one_two')) return;
-        if (team === 'A') { a.value = Math.min(125, parseInt(a.value) || 0); b.value = 100 - a.value; }
-        else { b.value = Math.min(125, parseInt(b.value) || 0); a.value = 100 - b.value; }
-        updatePreview();
-    }
-
-    function addEvent(type) {
-        if (type === 'one_two' && events.some(e => e.type === 'one_two')) return alert('원투는 하나만 가능합니다.');
-        if (events.filter(e => e.type !== 'one_two').length >= 4) return alert('티츄/라지는 최대 4개 가능합니다.');
-        events.push({ type, player_id: null, team: null, success: null });
-        if (type === 'one_two') {
-            document.getElementById('team-a-base-score').disabled = true;
-            document.getElementById('team-b-base-score').disabled = true;
-            document.getElementById('team-a-base-score').value = 0;
-            document.getElementById('team-b-base-score').value = 0;
-        }
-        renderEvents(); updatePreview();
-    }
-
-    function removeEvent(i) {
-        const type = events[i].type;
-        events.splice(i, 1);
-        if (type === 'one_two') {
-            document.getElementById('team-a-base-score').disabled = false;
-            document.getElementById('team-b-base-score').disabled = false;
-        }
-        renderEvents(); updatePreview();
-    }
-
-    function renderEvents() {
-        const container = document.getElementById('events-container');
-        container.innerHTML = events.length ? '' : '<div class="event-empty text-xs text-center py-4">추가된 이벤트 없음</div>';
-        events.forEach((e, i) => {
-            const div = document.createElement('div');
-            div.className = 'event-card';
-            let titleColor = e.type === 'tichu' ? '#A16207' : (e.type === 'grand' ? '#7E22CE' : '#065F46');
-            let title = e.type === 'tichu' ? '티츄' : (e.type === 'grand' ? '라지' : '원투');
-            let content = '';
-            if (e.type !== 'one_two') {
-                let btns = '<div class="grid grid-cols-2 gap-1 mb-3"><div class="flex flex-col gap-1">';
-                matchData.team_a_players.forEach(p => {
-                    btns += `<button onclick="updateEventPlayer(${i}, ${p.id})" class="text-sm font-bold py-2 rounded-lg border transition ${e.player_id === p.id ? 'bg-blue-600 text-white' : 'text-blue-700 hover:bg-blue-50'}" style="${e.player_id === p.id ? '' : 'background-color:var(--bg-card);color:var(--team-a-score)'}">${p.name}</button>`;
-                });
-                btns += '</div><div class="flex flex-col gap-1">';
-                matchData.team_b_players.forEach(p => {
-                    btns += `<button onclick="updateEventPlayer(${i}, ${p.id})" class="text-sm font-bold py-2 rounded-lg border transition ${e.player_id === p.id ? 'bg-red-600 text-white' : 'text-red-700 hover:bg-red-50'}" style="${e.player_id === p.id ? '' : 'background-color:var(--bg-card);color:var(--team-b-score)'}">${p.name}</button>`;
-                });
-                btns += '</div></div>';
-                content = `${btns}<div class="flex gap-1">
-                    <label class="flex-1 cursor-pointer"><input type="radio" name="s_${i}" ${e.success ? 'checked' : ''} onchange="updateEventSuccess(${i}, true)" class="peer hidden"><div class="text-xs text-center font-bold py-2 rounded-lg border peer-checked:bg-emerald-500 peer-checked:text-white transition event-toggle-default">성공</div></label>
-                    <label class="flex-1 cursor-pointer"><input type="radio" name="s_${i}" ${e.success === false ? 'checked' : ''} onchange="updateEventSuccess(${i}, false)" class="peer hidden"><div class="text-xs text-center font-bold py-2 rounded-lg border peer-checked:bg-red-500 peer-checked:text-white transition event-toggle-default">실패</div></label>
-                </div>`;
-            } else {
-                content = `<div class="flex gap-1 mt-2">
-                    <label class="flex-1 cursor-pointer"><input type="radio" name="t_${i}" ${e.team==='A'?'checked':''} onchange="updateEventTeam(${i}, 'A')" class="peer hidden"><div class="text-xs text-center font-bold py-2 rounded-lg border peer-checked:bg-blue-600 peer-checked:text-white transition event-toggle-default">TEAM A</div></label>
-                    <label class="flex-1 cursor-pointer"><input type="radio" name="t_${i}" ${e.team==='B'?'checked':''} onchange="updateEventTeam(${i}, 'B')" class="peer hidden"><div class="text-xs text-center font-bold py-2 rounded-lg border peer-checked:bg-red-600 peer-checked:text-white transition event-toggle-default">TEAM B</div></label>
-                </div>`;
-            }
-            div.innerHTML = `<div class="flex justify-between items-center mb-2"><span class="text-sm font-black" style="color:${titleColor}">${title}</span><button onclick="removeEvent(${i})" class="event-delete px-2">삭제</button></div>${content}`;
-            container.appendChild(div);
-        });
-    }
-
-    function updateEventPlayer(i, id) { events[i].player_id = id; renderEvents(); updatePreview(); }
-    function updateEventSuccess(i, s) { events[i].success = s; updatePreview(); }
-    function updateEventTeam(i, t) { events[i].team = t; updatePreview(); }
-
-    function updatePreview() {
-        let aBase = parseInt(document.getElementById('team-a-base-score').value) || 0;
-        let bBase = parseInt(document.getElementById('team-b-base-score').value) || 0;
-        const ot = events.find(e => e.type === 'one_two');
-        let a = ot ? (ot.team === 'A' ? 200 : 0) : aBase, b = ot ? (ot.team === 'B' ? 200 : 0) : bBase;
-        events.forEach(e => {
-            if (e.player_id && e.success !== null) {
-                const bonus = (e.type === 'tichu' ? 100 : 200) * (e.success ? 1 : -1);
-                if (matchData.team_a_ids.includes(e.player_id)) a += bonus; else b += bonus;
-            }
-        });
-        document.getElementById('preview-team-a').textContent = a;
-        document.getElementById('preview-team-b').textContent = b;
+    function resetInput() {
+        events = [];
+        currentRoundNumber = matchData.rounds.length > 0 ? Math.max(...matchData.rounds.map(r => r.round_number)) + 1 : 1;
+        setSliders(50, 50, false);
+        renderEventBtnGrid();
+        renderTags();
     }
 
     async function saveRound() {
-        const teamABase = parseInt(document.getElementById('team-a-base-score').value) || 0;
-        const teamBBase = parseInt(document.getElementById('team-b-base-score').value) || 0;
-        const hasOneTwoEvent = events.some(e => e.type === 'one_two');
-        if (teamABase === 0 && teamBBase === 0 && events.length === 0) { alert("점수나 이벤트를 입력해주세요."); return; }
-        if (!hasOneTwoEvent && teamABase + teamBBase !== 100) { alert("원투가 아닐 경우 기본 점수 합계가 100점이어야 합니다."); return; }
+        const hasOT = events.some(e => e.type === 'one_two');
+        const teamABase = hasOT ? 0 : parseInt(document.getElementById('slider-a').value);
+        const teamBBase = hasOT ? 0 : parseInt(document.getElementById('slider-b').value);
+        if (!hasOT && teamABase + teamBBase !== 100) { alert("기본 점수 합계가 100점이어야 합니다."); return; }
+
         for (const e of events) {
             if (e.type === 'one_two' && !e.team) { alert("원투의 팀을 선택해주세요."); return; }
-            if (e.type !== 'one_two') {
-                if (!e.player_id) { alert(`${e.type === 'tichu' ? '티츄' : '라지'}의 플레이어를 선택해주세요.`); return; }
-                if (e.success === null) { alert(`${e.type === 'tichu' ? '티츄' : '라지'}의 성공/실패를 선택해주세요.`); return; }
-            }
+            if (e.type !== 'one_two' && !e.player_id) { alert(`${e.type === 'tichu' ? '티츄' : '라지'}의 플레이어를 선택해주세요.`); return; }
         }
+
+        // 티츄/라지 성공 2명 이상 막기
         const successEvents = events.filter(e => e.type !== 'one_two' && e.success === true);
         if (successEvents.length > 1) { alert("티츄/라지 성공은 라운드당 1명만 가능합니다."); return; }
-        const oneTwoEvent = events.find(e => e.type === 'one_two' && e.team);
-        if (oneTwoEvent && successEvents.length > 0) {
+
+        // 원투 팀 + 상대팀 티츄/라지 성공 막기
+        const otEvent = events.find(e => e.type === 'one_two');
+        if (otEvent && successEvents.length > 0) {
             const successPlayer = successEvents[0];
             const isTeamA = matchData.team_a_ids.includes(successPlayer.player_id);
             const successTeam = isTeamA ? 'A' : 'B';
-            if (successTeam !== oneTwoEvent.team) { alert(`${oneTwoEvent.team === 'A' ? 'TEAM A' : 'TEAM B'} 원투 시 상대팀은 티츄/라지를 성공할 수 없습니다.`); return; }
+            if (successTeam !== otEvent.team) {
+                alert(`${otEvent.team === 'A' ? 'A팀' : 'B팀'} 원투 시 상대팀은 티츄/라지를 성공할 수 없습니다.`);
+                return;
+            }
         }
+
         const data = { round_number: currentRoundNumber, team_a_base_score: teamABase, team_b_base_score: teamBBase, events };
         try {
             const res = await fetch(`/api/matches/${matchId}/rounds`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
             if (!res.ok) throw new Error((await res.json()).detail);
             matchData = await res.json();
-            closeRoundModal(); renderTeamInfo(); renderRounds();
+            renderTeamInfo(); renderRounds();
+            initInputPanel();
             if (matchData.status === 'FINISHED') showVictoryModal();
         } catch (e) { alert(e.message); }
-    }
-
-    async function deleteRound() {
-        if (!confirm('정말 이 라운드를 삭제하시겠습니까?')) return;
-        try {
-            const res = await fetch(`/api/matches/${matchId}/rounds/${currentRoundNumber}`, { method: 'DELETE' });
-            if (!res.ok) throw new Error('삭제 실패');
-            await loadMatchData();
-            closeRoundModal();
-        } catch (e) { alert('삭제에 실패했습니다.'); }
     }
 
     function showVictoryModal() {
