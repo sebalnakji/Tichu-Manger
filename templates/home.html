@@ -91,8 +91,8 @@
     .accent-btn:active { transform: scale(0.98); }
 </style>
 
-<div class="home-bg min-h-screen">
-    <div class="max-w-lg mx-auto px-4 py-8 flex flex-col min-h-screen">
+<div class="home-bg fixed inset-0 overflow-y-auto">
+    <div class="max-w-lg mx-auto px-4 py-8 flex flex-col min-h-full">
 
         <!-- 타이틀 -->
         <div class="mb-8 mt-2">
@@ -126,7 +126,7 @@
                 <div class="text-4xl">⏸️</div>
             </div>
 
-            <!-- 이어하기 - 게임 있을 때 (이모지 없음) -->
+            <!-- 이어하기 - 게임 있을 때 -->
             <div id="ongoing-games-card" class="hidden home-card p-5">
                 <div class="mb-4 pb-3 border-b card-divider">
                     <p class="text-xs font-bold uppercase tracking-widest t-label mb-0.5">Continue</p>
@@ -194,7 +194,6 @@
 
             if (games.length === 0) return;
 
-            // 게임 있으면 카드 전환
             emptyCard.classList.add('hidden');
             gamesCard.classList.remove('hidden');
 

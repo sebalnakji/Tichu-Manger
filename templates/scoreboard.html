@@ -383,7 +383,7 @@
     .custom-scrollbar::-webkit-scrollbar-thumb { background-color: var(--scrollbar-color); border-radius: 20px; }
 </style>
 
-<div class="page-bg min-h-screen flex flex-col relative">
+<div class="page-bg fixed inset-0 flex flex-col overflow-hidden">
 
     <!-- 헤더 -->
     <div class="sticky top-0 z-40 sb-header shadow-sm">
@@ -398,7 +398,7 @@
         </div>
     </div>
 
-    <div class="flex-1 max-w-lg mx-auto w-full px-4 pt-6 pb-32">
+    <div class="flex-1 max-w-lg mx-auto w-full px-4 pt-6 pb-32 overflow-y-auto">
 
         <!-- 점수판 카드 -->
         <div class="score-card mb-8">
