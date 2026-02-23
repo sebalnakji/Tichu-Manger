@@ -151,10 +151,6 @@
                     <h2 class="text-lg font-black tracking-tight ts-title">멤버 선택</h2>
                 </div>
                 <div class="flex items-center justify-end gap-2 mr-2">
-                    <div class="flex items-center rounded-full p-0.5 mr-4 whitespace-nowrap" style="background-color:var(--bg-card-sub); border:1px solid var(--border);">
-                        <button id="mode-btn-auto" onclick="setAssignMode('random')" class="px-3 py-1 text-[11px] font-bold rounded-full transition" style="background-color:#10B981; color:white;">자동</button>
-                        <button id="mode-btn-manual" onclick="setAssignMode('manual')" class="px-3 py-1 text-[11px] font-bold rounded-full transition" style="background-color:transparent; color:var(--text-muted);">수동</button>
-                    </div>
                     <button id="add-member-btn" class="text-2xl p-2 -mr-2 rounded-full transition ts-add-btn">
                         <span id="add-member-icon">➕</span>
                         <span id="add-member-lock" class="hidden text-sm">🔒</span>
@@ -171,9 +167,12 @@
     </div>
 
     <div class="flex-1 max-w-lg mx-auto w-full px-4 pt-3 flex flex-col overflow-hidden">
-        <div class="flex justify-between items-end mb-2 px-1">
+        <div class="flex justify-between items-center mb-2 px-1">
             <h3 class="text-sm font-bold section-label uppercase tracking-wider">전체 플레이어</h3>
-            <span class="text-xs font-medium section-label">최근 전적 순</span>
+            <div class="flex items-center rounded-full p-0.5 whitespace-nowrap" style="background-color:var(--bg-card-sub); border:1px solid var(--border);">
+                <button id="mode-btn-auto" onclick="setAssignMode('random')" class="px-3 py-1 text-[11px] font-bold rounded-full transition" style="background-color:#10B981; color:white;">자동</button>
+                <button id="mode-btn-manual" onclick="setAssignMode('manual')" class="px-3 py-1 text-[11px] font-bold rounded-full transition" style="background-color:transparent; color:var(--text-muted);">수동</button>
+            </div>
         </div>
         <div id="all-players-list" class="grid grid-cols-3 gap-2 overflow-y-auto flex-1 content-start pb-24"></div>
     </div>
