@@ -238,11 +238,11 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold uppercase mb-1 ml-1 add-modal-label">닉네임</label>
-                    <input type="text" id="new-member-name" class="add-modal-input" placeholder="예: 티츄왕">
+                    <input type="text" id="new-member-name" class="add-modal-input" placeholder="예: 티츄왕" maxlength="10">
                 </div>
                 <div>
                     <label class="block text-xs font-bold uppercase mb-1 ml-1 add-modal-label">접속 코드</label>
-                    <input type="text" id="new-member-code" class="add-modal-input" placeholder="공백 없이 입력">
+                    <input type="text" id="new-member-code" class="add-modal-input" placeholder="공백 없이 3~20자" maxlength="20">
                 </div>
                 <div id="add-member-error" class="hidden p-3 bg-red-50 text-red-600 text-xs rounded-lg flex items-center gap-2">
                     <span id="error-msg">에러 메시지</span>
@@ -444,7 +444,9 @@
         const code = document.getElementById('new-member-code').value;
         const errorDiv = document.getElementById('add-member-error');
         const errorMsg = document.getElementById('error-msg');
-        if (!name || !code || /\s/.test(code)) { errorMsg.textContent = '이름과 공백 없는 코드를 입력해주세요.'; errorDiv.classList.remove('hidden'); return; }
+        if (!name || name.length > 10) { errorMsg.textContent = '이름은 1~10자로 입력해주세요.'; errorDiv.classList.remove('hidden'); return; }
+        if (!code || code.length < 3 || code.length > 20) { errorMsg.textContent = '코드는 3~20자로 입력해주세요.'; errorDiv.classList.remove('hidden'); return; }
+        if (/\s/.test(code)) { errorMsg.textContent = '코드에는 공백을 포함할 수 없습니다.'; errorDiv.classList.remove('hidden'); return; }
         try {
             const res = await fetch('/api/players/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, code }) });
             if (!res.ok) { const error = await res.json(); throw new Error(error.detail); }

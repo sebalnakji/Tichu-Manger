@@ -10,8 +10,8 @@ import re
 
 class PlayerCreate(BaseModel):
     """플레이어 생성 요청"""
-    name: str = Field(..., min_length=1, max_length=50, description="플레이어 이름")
-    code: str = Field(..., min_length=1, max_length=50, description="접속 코드 (공백 불가)")
+    name: str = Field(..., min_length=1, max_length=10, description="플레이어 이름")
+    code: str = Field(..., min_length=3, max_length=20, description="접속 코드 (공백 불가)")
     profile_url: Optional[str] = Field(None, description="프로필 이미지 URL")
 
     @field_validator('code')
@@ -25,8 +25,8 @@ class PlayerCreate(BaseModel):
 
 class PlayerUpdate(BaseModel):
     """플레이어 수정 요청"""
-    name: Optional[str] = Field(None, min_length=1, max_length=50)
-    code: Optional[str] = Field(None, min_length=1, max_length=50)
+    name: Optional[str] = Field(None, min_length=1, max_length=10)
+    code: Optional[str] = Field(None, min_length=3, max_length=20)
     profile_url: Optional[str] = None
 
     @field_validator('code')

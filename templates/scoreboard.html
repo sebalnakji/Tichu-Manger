@@ -544,28 +544,29 @@
         // 행2(실패): A1 T❌, A1 L❌, A2 T❌, A2 L❌, B팀원투, B1 T❌, B1 L❌, B2 T❌, B2 L❌
 
         const mkKey = (team, pid, type, suf) => `${team}-${pid}-${type}-${suf}`;
+        const shortName = p => p.name.slice(-2);
 
         const row1 = [
             ...aPlayers.flatMap(p => [
-                { key: mkKey('a',p.id,'tichu','s'), label:`${p.name} T`, type:'tichu', player_id:p.id, success:true,  team:null, success_icon:'✅', textColor:'#92400E', activeBg:'#FEF3C7', borderColor:'rgba(234,179,8,0.5)' },
-                { key: mkKey('a',p.id,'grand','s'), label:`${p.name} L`, type:'grand', player_id:p.id, success:true,  team:null, success_icon:'✅', textColor:'#6D28D9', activeBg:'#EDE9FE', borderColor:'rgba(139,92,246,0.5)' },
+                { key: mkKey('a',p.id,'tichu','s'), label:`${shortName(p)} T`, type:'tichu', player_id:p.id, success:true,  team:null, success_icon:'✅', textColor:'#92400E', activeBg:'#FEF3C7', borderColor:'rgba(234,179,8,0.5)' },
+                { key: mkKey('a',p.id,'grand','s'), label:`${shortName(p)} L`, type:'grand', player_id:p.id, success:true,  team:null, success_icon:'✅', textColor:'#6D28D9', activeBg:'#EDE9FE', borderColor:'rgba(139,92,246,0.5)' },
             ]),
             { key:'ot-A', label:'A팀\n원투', type:'one_two', player_id:null, success:null, team:'A', success_icon:'', textColor:'#4F46E5', activeBg:'#D1FAE5', borderColor:'rgba(16,185,129,0.5)' },
             ...bPlayers.flatMap(p => [
-                { key: mkKey('b',p.id,'tichu','s'), label:`${p.name} T`, type:'tichu', player_id:p.id, success:true,  team:null, success_icon:'✅', textColor:'#92400E', activeBg:'#FEF3C7', borderColor:'rgba(234,179,8,0.5)' },
-                { key: mkKey('b',p.id,'grand','s'), label:`${p.name} L`, type:'grand', player_id:p.id, success:true,  team:null, success_icon:'✅', textColor:'#6D28D9', activeBg:'#EDE9FE', borderColor:'rgba(139,92,246,0.5)' },
+                { key: mkKey('b',p.id,'tichu','s'), label:`${shortName(p)} T`, type:'tichu', player_id:p.id, success:true,  team:null, success_icon:'✅', textColor:'#92400E', activeBg:'#FEF3C7', borderColor:'rgba(234,179,8,0.5)' },
+                { key: mkKey('b',p.id,'grand','s'), label:`${shortName(p)} L`, type:'grand', player_id:p.id, success:true,  team:null, success_icon:'✅', textColor:'#6D28D9', activeBg:'#EDE9FE', borderColor:'rgba(139,92,246,0.5)' },
             ]),
         ];
 
         const row2 = [
             ...aPlayers.flatMap(p => [
-                { key: mkKey('a',p.id,'tichu','f'), label:`${p.name} T`, type:'tichu', player_id:p.id, success:false, team:null, success_icon:'❌', textColor:'#991B1B', activeBg:'#FEE2E2', borderColor:'rgba(239,68,68,0.4)' },
-                { key: mkKey('a',p.id,'grand','f'), label:`${p.name} L`, type:'grand', player_id:p.id, success:false, team:null, success_icon:'❌', textColor:'#991B1B', activeBg:'#FEE2E2', borderColor:'rgba(239,68,68,0.4)' },
+                { key: mkKey('a',p.id,'tichu','f'), label:`${shortName(p)} T`, type:'tichu', player_id:p.id, success:false, team:null, success_icon:'❌', textColor:'#991B1B', activeBg:'#FEE2E2', borderColor:'rgba(234,179,8,0.5)' },
+                { key: mkKey('a',p.id,'grand','f'), label:`${shortName(p)} L`, type:'grand', player_id:p.id, success:false, team:null, success_icon:'❌', textColor:'#991B1B', activeBg:'#FEE2E2', borderColor:'rgba(139,92,246,0.5)' },
             ]),
             { key:'ot-B', label:'B팀\n원투', type:'one_two', player_id:null, success:null, team:'B', success_icon:'', textColor:'#F43F5E', activeBg:'#D1FAE5', borderColor:'rgba(16,185,129,0.5)' },
             ...bPlayers.flatMap(p => [
-                { key: mkKey('b',p.id,'tichu','f'), label:`${p.name} T`, type:'tichu', player_id:p.id, success:false, team:null, success_icon:'❌', textColor:'#991B1B', activeBg:'#FEE2E2', borderColor:'rgba(239,68,68,0.4)' },
-                { key: mkKey('b',p.id,'grand','f'), label:`${p.name} L`, type:'grand', player_id:p.id, success:false, team:null, success_icon:'❌', textColor:'#991B1B', activeBg:'#FEE2E2', borderColor:'rgba(239,68,68,0.4)' },
+                { key: mkKey('b',p.id,'tichu','f'), label:`${shortName(p)} T`, type:'tichu', player_id:p.id, success:false, team:null, success_icon:'❌', textColor:'#991B1B', activeBg:'#FEE2E2', borderColor:'rgba(234,179,8,0.5)' },
+                { key: mkKey('b',p.id,'grand','f'), label:`${shortName(p)} L`, type:'grand', player_id:p.id, success:false, team:null, success_icon:'❌', textColor:'#991B1B', activeBg:'#FEE2E2', borderColor:'rgba(139,92,246,0.5)' },
             ]),
         ];
 
