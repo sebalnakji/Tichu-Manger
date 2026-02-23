@@ -4,6 +4,9 @@
  */
 
 const AuthManager = {
+    ACTIVITY_KEY: 'tichu_last_activity',
+    TIMEOUT_MS: 5 * 60 * 60 * 1000, // 5시간
+
     /**
      * 인증 정보 저장
      */
@@ -15,6 +18,7 @@ const AuthManager = {
             timestamp: new Date().getTime()
         };
         localStorage.setItem('tichu_auth', JSON.stringify(authData));
+        this.updateActivity();
     },
 
     /**
@@ -33,10 +37,17 @@ const AuthManager = {
     },
 
     /**
-     * 인증 여부 확인
+     * 인증 여부 확인 (만료 시 자동 로그아웃)
      */
     isAuthenticated() {
-        return this.getAuth() !== null;
+        const auth = this.getAuth();
+        if (!auth) return false;
+        const last = parseInt(localStorage.getItem(this.ACTIVITY_KEY) || '0');
+        if (last && Date.now() - last > this.TIMEOUT_MS) {
+            this.logout();
+            return false;
+        }
+        return true;
     },
 
     /**
@@ -53,6 +64,39 @@ const AuthManager = {
     logout() {
         localStorage.removeItem('tichu_auth');
         localStorage.removeItem('admin_code');
+        localStorage.removeItem(this.ACTIVITY_KEY);
+    },
+
+    /**
+     * 마지막 활동 시간 갱신
+     */
+    updateActivity() {
+        localStorage.setItem(this.ACTIVITY_KEY, Date.now().toString());
+    },
+
+    /**
+     * 비활동 만료 체크 — 만료 시 자동 로그아웃
+     */
+    checkExpiry() {
+        if (!this.getAuth()) return;
+        const last = parseInt(localStorage.getItem(this.ACTIVITY_KEY) || '0');
+        if (last && Date.now() - last > this.TIMEOUT_MS) {
+            this.logout();
+            window.location.reload();
+        }
+    },
+
+    /**
+     * 활동 감지 + 주기적 만료 체크 시작
+     */
+    startActivityTracker() {
+        this.checkExpiry();
+        ['click', 'touchstart'].forEach(evt => {
+            document.addEventListener(evt, () => {
+                if (this.getAuth()) this.updateActivity();
+            }, { passive: true });
+        });
+        setInterval(() => this.checkExpiry(), 60 * 1000);
     },
 
     /**
@@ -216,3 +260,8 @@ const AuthManager = {
 
 // 전역으로 노출
 window.AuthManager = AuthManager;
+
+// 페이지 로드 시 활동 트래커 시작
+document.addEventListener('DOMContentLoaded', () => {
+    AuthManager.startActivityTracker();
+});
