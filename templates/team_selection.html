@@ -139,17 +139,27 @@
 <div class="page-bg fixed inset-0 flex flex-col overflow-hidden">
     <div class="sticky top-0 z-40 ts-header shadow-sm transition-all duration-300">
         <div class="max-w-lg mx-auto px-4 py-2">
-            <div class="flex items-center justify-between mb-2">
-                <a href="/" class="p-2 -ml-2 rounded-full transition ts-back-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                    </svg>
-                </a>
-                <h2 class="text-lg font-black tracking-tight ts-title">멤버 선택</h2>
-                <button id="add-member-btn" class="text-2xl p-2 -mr-2 rounded-full transition ts-add-btn">
-                    <span id="add-member-icon">➕</span>
-                    <span id="add-member-lock" class="hidden text-sm">🔒</span>
-                </button>
+            <div class="grid grid-cols-3 items-center mb-2">
+                <div class="flex items-center">
+                    <a href="/" class="p-2 -ml-2 rounded-full transition ts-back-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </a>
+                </div>
+                <div class="flex justify-center">
+                    <h2 class="text-lg font-black tracking-tight ts-title">멤버 선택</h2>
+                </div>
+                <div class="flex items-center justify-end gap-2 mr-2">
+                    <div class="flex items-center rounded-full p-0.5 mr-4 whitespace-nowrap" style="background-color:var(--bg-card-sub); border:1px solid var(--border);">
+                        <button id="mode-btn-auto" onclick="setAssignMode('random')" class="px-3 py-1 text-[11px] font-bold rounded-full transition" style="background-color:#10B981; color:white;">자동</button>
+                        <button id="mode-btn-manual" onclick="setAssignMode('manual')" class="px-3 py-1 text-[11px] font-bold rounded-full transition" style="background-color:transparent; color:var(--text-muted);">수동</button>
+                    </div>
+                    <button id="add-member-btn" class="text-2xl p-2 -mr-2 rounded-full transition ts-add-btn">
+                        <span id="add-member-icon">➕</span>
+                        <span id="add-member-lock" class="hidden text-sm">🔒</span>
+                    </button>
+                </div>
             </div>
             <div class="flex justify-between items-center gap-2">
                 <div id="selected-slots" class="grid grid-cols-4 gap-2 w-full"></div>
@@ -256,7 +266,6 @@
         setupEventListeners();
         renderEmptySlots();
 
-        // 비로그인 시 자동으로 인증 모달 표시
         if (!AuthManager.isAuthenticated()) {
             AuthManager.showAuthModal((data) => {
                 const name = data.player_name || '관리자';
@@ -269,6 +278,26 @@
     let selectedPlayers = [];
     let allPlayersData = [];
     let teamAssignment = null;
+    let assignMode = 'random';
+
+    function setAssignMode(mode) {
+        assignMode = mode;
+        const btnAuto = document.getElementById('mode-btn-auto');
+        const btnManual = document.getElementById('mode-btn-manual');
+        if (mode === 'random') {
+            btnAuto.style.backgroundColor = '#10B981';
+            btnAuto.style.color = 'white';
+            btnManual.style.backgroundColor = 'transparent';
+            btnManual.style.color = 'var(--text-muted)';
+        } else {
+            btnManual.style.backgroundColor = '#3B82F6';
+            btnManual.style.color = 'white';
+            btnAuto.style.backgroundColor = 'transparent';
+            btnAuto.style.color = 'var(--text-muted)';
+        }
+        renderEmptySlots();
+        renderAllPlayers();
+    }
 
     function updateUIByAuthState() {
         const isAuth = AuthManager.isAuthenticated();
@@ -279,12 +308,21 @@
     function renderEmptySlots() {
         const container = document.getElementById('selected-slots');
         container.innerHTML = '';
-        selectedPlayers.forEach(id => {
+        selectedPlayers.forEach((id, index) => {
             const player = allPlayersData.find(p => p.id === id);
             if (player) {
+                const isTeamA = assignMode === 'manual' ? index < 2 : false;
+                const isTeamB = assignMode === 'manual' ? index >= 2 : false;
+                const borderStyle = assignMode === 'manual'
+                    ? (isTeamA ? 'border: 2px solid #3B82F6;' : 'border: 2px solid #EF4444;')
+                    : '';
+                const teamLabel = assignMode === 'manual'
+                    ? `<div class="absolute top-0.5 left-0.5 text-[8px] font-black px-1 rounded-full ${isTeamA ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'}">${isTeamA ? 'A' : 'B'}</div>`
+                    : '';
                 container.innerHTML += `
-                    <div class="aspect-square rounded-xl slot-selected flex flex-col items-center justify-center relative cursor-pointer group" onclick="togglePlayerSelection(${player.id})">
+                    <div class="aspect-square rounded-xl slot-selected flex flex-col items-center justify-center relative cursor-pointer group" style="${borderStyle}" onclick="togglePlayerSelection(${player.id})">
                         <img src="${player.profile_url}" class="w-full h-full object-cover rounded-lg opacity-90">
+                        ${teamLabel}
                         <div class="absolute inset-0 bg-black/10 flex items-center justify-center rounded-lg opacity-0 group-hover:opacity-100 transition"><span class="text-white font-bold text-xs">취소</span></div>
                         <div class="absolute -bottom-1 left-0 right-0 text-center">
                             <span class="text-[10px] font-bold bg-white px-1.5 py-0.5 rounded-full border border-gray-100 shadow-sm truncate max-w-[90%] inline-block">${player.name}</span>
@@ -294,7 +332,14 @@
         });
         const emptyCount = 4 - selectedPlayers.length;
         for (let i = 0; i < emptyCount; i++) {
-            container.innerHTML += `<div class="aspect-square rounded-xl slot-empty flex flex-col items-center justify-center"><span class="text-xl font-light">+</span><span class="text-[10px]">선택</span></div>`;
+            const slotIndex = selectedPlayers.length + i;
+            const borderStyle = assignMode === 'manual'
+                ? (slotIndex < 2 ? 'border: 2px dashed #93C5FD;' : 'border: 2px dashed #FCA5A5;')
+                : '';
+            const label = assignMode === 'manual'
+                ? `<span class="text-[8px] font-black mb-0.5 ${slotIndex < 2 ? 'text-blue-400' : 'text-red-400'}">${slotIndex < 2 ? 'A팀' : 'B팀'}</span>`
+                : '';
+            container.innerHTML += `<div class="aspect-square rounded-xl slot-empty flex flex-col items-center justify-center" style="${borderStyle}">${label}<span class="text-xl font-light">+</span><span class="text-[10px]">선택</span></div>`;
         }
     }
 
@@ -409,11 +454,30 @@
     }
 
     async function assignTeams() {
-        try {
-            const res = await fetch('/api/matches/assign-teams', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(selectedPlayers) });
-            teamAssignment = await res.json();
+        if (assignMode === 'manual') {
+            // 수동 모드: 선택 순서대로 1~2번째 A팀, 3~4번째 B팀
+            teamAssignment = {
+                team_a: [selectedPlayers[0], selectedPlayers[1]],
+                team_b: [selectedPlayers[2], selectedPlayers[3]],
+                team_a_stats: { total_games: 0, wins: 0, win_rate: 0 },
+                team_b_stats: { total_games: 0, wins: 0, win_rate: 0 }
+            };
+            // 팀 전적 조회
+            try {
+                const res = await fetch('/api/matches/assign-teams', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(selectedPlayers) });
+                const data = await res.json();
+                // 전적 정보만 활용, 팀 구성은 수동 유지
+                teamAssignment.team_a_stats = data.team_a_stats || teamAssignment.team_a_stats;
+                teamAssignment.team_b_stats = data.team_b_stats || teamAssignment.team_b_stats;
+            } catch (e) {}
             displayTeamResult(teamAssignment);
-        } catch (e) { alert('배정 실패'); }
+        } else {
+            try {
+                const res = await fetch('/api/matches/assign-teams', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(selectedPlayers) });
+                teamAssignment = await res.json();
+                displayTeamResult(teamAssignment);
+            } catch (e) { alert('배정 실패'); }
+        }
     }
 
     async function displayTeamResult(teams) {
