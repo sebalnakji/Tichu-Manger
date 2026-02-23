@@ -60,7 +60,7 @@
         --spinner-color: var(--accent);
     }
 
-    .page-bg { background-color: var(--bg-main); min-height: 100vh; }
+    .page-bg { background-color: var(--bg-main); }
 
     .lb-back-btn {
         background-color: var(--bg-card);
@@ -151,7 +151,7 @@
     @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 
-<div class="page-bg">
+<div class="page-bg fixed inset-0 overflow-y-auto">
     <div class="max-w-md mx-auto px-4 pb-20">
         <div class="relative flex items-center justify-between py-6 mb-2">
             <a href="/" class="lb-back-btn group-active:scale-95 transition-transform z-10">
