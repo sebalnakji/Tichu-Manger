@@ -25,13 +25,13 @@
 |------|------|
 | **Backend** | Python 3.11, FastAPI, SQLAlchemy, Jinja2 |
 | **Frontend** | Vanilla JS, Tailwind CSS (CDN) |
-| **Storage** | Supabase Storage (프로필 이미지) |
+| **Storage** | Supabase Storage (메타데이터 + 프로필 이미지) |
 | **Scheduler** | APScheduler (미완료 게임 자동 정리) |
 
 ### 환경별 구성
 
 - **개발 환경** — SQLite (로컬 파일 DB, 별도 설정 불필요)
-- **운영 환경** — [Koyeb](https://koyeb.com) (서버 배포) + [Supabase](https://supabase.com) (PostgreSQL + Storage)
+- **운영 환경** — [Koyeb](https://koyeb.com) (서버 배포) + [Supabase](https://supabase.com) (PostgreSQL + Storage) + [UptimeRobot](https://uptimerobot.com) (서버 상시 유지)
 
 ## 실행 방법
 
