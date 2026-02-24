@@ -627,9 +627,10 @@
             else if (e.type === 'grand' && e.success) { bg = '#EDE9FE'; color = '#6D28D9'; }
             else { bg = '#FEE2E2'; color = '#991B1B'; }
             const tag = document.createElement('span');
-            tag.className = 'text-xs font-bold px-2 py-0.5 rounded-lg flex items-center gap-1';
+            tag.className = 'text-xs font-bold px-2 py-0.5 rounded-lg flex items-center gap-1 cursor-pointer active:scale-95 transition';
             tag.style.cssText = `background-color:${bg}; color:${color};`;
-            tag.innerHTML = `${text} <button onclick="removeEventByIndex(${i})" style="opacity:0.6; font-size:0.75rem; line-height:1;">✕</button>`;
+            tag.onclick = () => removeEventByIndex(i);
+            tag.innerHTML = `${text} <span style="opacity:0.6; font-size:0.75rem; line-height:1;">✕</span>`;
             container.appendChild(tag);
         });
     }
@@ -697,6 +698,15 @@
         for (const e of events) {
             if (e.type === 'one_two' && !e.team) { alert("원투의 팀을 선택해주세요."); return; }
             if (e.type !== 'one_two' && !e.player_id) { alert(`${e.type === 'tichu' ? '티츄' : '라지'}의 플레이어를 선택해주세요.`); return; }
+        }
+
+        // 같은 플레이어 중복 이벤트 막기
+        const playerEvents = events.filter(e => e.type !== 'one_two' && e.player_id);
+        const playerIds = playerEvents.map(e => e.player_id);
+        const duplicateId = playerIds.find((id, i) => playerIds.indexOf(id) !== i);
+        if (duplicateId) {
+            const p = [...matchData.team_a_players, ...matchData.team_b_players].find(x => x.id === duplicateId);
+            alert(`${p ? p.name : ''} 님이 중복 등록되어 있습니다.`); return;
         }
 
         // 티츄/라지 성공 2명 이상 막기
