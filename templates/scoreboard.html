@@ -368,6 +368,8 @@
             </div>
         </div>
     </div>
+
+    </div>
 </div>
 
 <!-- 승리 모달 -->
@@ -650,7 +652,7 @@
             container.innerHTML = '<div class="round-empty w-full text-center text-sm py-8">기록된 라운드가 없습니다.</div>';
             return;
         }
-        [...matchData.rounds].sort((a, b) => a.round_number - b.round_number).forEach(round => {
+        [...matchData.rounds].sort((a, b) => b.round_number - a.round_number).forEach(round => {
             const div = document.createElement('div');
             div.className = 'round-card';
             let eventBadges = '';
