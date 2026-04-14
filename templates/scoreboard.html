@@ -753,7 +753,7 @@
                         <span class="text-2xl font-black round-score-b">${round.team_b_total}</span>
                     </div>
                 </div>
-                ${eventBadges ? `<div class="flex flex-wrap gap-1 mt-1">${eventBadges}</div>` : ''}`;
+                <div class="flex flex-wrap gap-1 mt-1 min-h-[22px]">${eventBadges}</div>`;
             container.appendChild(div);
         });
     }
