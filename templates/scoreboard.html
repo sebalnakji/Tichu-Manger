@@ -121,7 +121,7 @@
     .sb-back { color: var(--text-secondary); }
     .sb-back:hover { background-color: var(--bg-card-sub); }
     .sb-exit-btn {
-        color: var(--text-muted);
+        color: var(--text-secondary);
         border: 1px solid var(--border);
         border-radius: 0.5rem;
         font-size: 0.75rem;
@@ -129,7 +129,17 @@
         padding: 0.375rem 0.75rem;
         transition: all 0.15s;
     }
-    .sb-exit-btn:hover { background-color: rgba(244,63,94,0.05); color: #F43F5E; border-color: rgba(244,63,94,0.3); }
+    .sb-exit-btn:hover { background-color: var(--bg-card-sub); color: var(--text-primary); }
+    .sb-direct-btn {
+        color: var(--text-secondary);
+        border: 1px solid var(--border);
+        border-radius: 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 0.375rem 0.75rem;
+        transition: all 0.15s;
+    }
+    .sb-direct-btn:hover { background-color: var(--bg-card-sub); color: var(--text-primary); }
 
     /* 간략화된 점수판 카드 */
     .score-card {
@@ -161,7 +171,13 @@
         transition: background-color 0.15s;
     }
     .round-card:hover { background-color: var(--bg-card-sub); }
+    .round-card:hover .round-edit-btn { background-color: var(--round-card-bg); }
     .round-label { color: var(--text-muted); }
+    .round-edit-btn { color: var(--text-secondary); background-color: var(--bg-card-sub); border: 1px solid rgba(0,0,0,0.12); }
+    [data-theme="dark"] .round-edit-btn { color: var(--text-muted); border: 1px solid rgba(255,255,255,0.12); }
+    .round-delete-btn { background-color: rgba(244,63,94,0.12); color: #F43F5E; border: 1px solid rgba(244,63,94,0.25); }
+    .round-badge { border: 1px solid rgba(0,0,0,0.10); }
+    [data-theme="dark"] .round-badge { border: 1px solid rgba(255,255,255,0.10); }
     .round-score-a { color: var(--team-a-score); }
     .round-score-b { color: var(--team-b-score); }
     .round-empty {
@@ -233,6 +249,8 @@
     .event-empty { color: var(--text-muted); border: 1px dashed var(--round-empty-border); border-radius: 0.75rem; }
     .event-delete { color: var(--text-muted); font-size: 0.75rem; font-weight: 700; }
     .event-delete:hover { color: #F43F5E; }
+    .event-tag { border: 1px solid rgba(0,0,0,0.12); }
+    [data-theme="dark"] .event-tag { border: 1px solid rgba(255,255,255,0.12); }
     .event-toggle-default { background-color: var(--bg-card); color: var(--text-primary); }
     .modal-footer { background-color: var(--modal-footer-bg); border-top: 1px solid var(--modal-border); }
     .preview-a { color: var(--team-a-score); font-weight: 700; }
@@ -274,14 +292,17 @@
 
     <!-- 최상단 헤더 -->
     <div class="sb-header shadow-sm shrink-0">
-        <div class="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
+        <div class="max-w-lg mx-auto px-4 py-3 flex items-center justify-between relative">
             <a href="/" class="p-2 -ml-2 rounded-full transition sb-back">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                 </svg>
             </a>
-            <h2 class="text-lg font-black sb-title">점수판</h2>
-            <button id="exit-game-btn" class="sb-exit-btn">종료</button>
+            <h2 class="text-lg font-black sb-title absolute left-1/2 -translate-x-1/2">점수판</h2>
+            <div class="flex items-center gap-1.5">
+                <button onclick="openDirectModal()" class="sb-direct-btn">입력</button>
+                <button id="exit-game-btn" class="sb-exit-btn">종료</button>
+            </div>
         </div>
     </div>
 
@@ -406,6 +427,55 @@
                     <button onclick="closeVictoryModal()" class="victory-btn-sub">수정</button>
                     <button onclick="goHome()" class="victory-btn-sub">홈</button>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 직접 입력 모달 -->
+<div id="direct-modal" class="hidden fixed inset-0 z-[70] flex items-end justify-center bg-black/60 backdrop-blur-sm">
+    <div class="w-full max-w-lg pb-safe" style="background-color:var(--bg-card); border-radius:1.5rem 1.5rem 0 0;">
+        <div class="px-6 pt-6 pb-8">
+            <!-- 헤더 -->
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-black" style="color:var(--text-primary);">직접 입력</h3>
+                <button onclick="closeDirectModal()" class="w-8 h-8 flex items-center justify-center rounded-full transition" style="background-color:var(--bg-card-sub); color:var(--text-muted);">✕</button>
+            </div>
+
+            <!-- 팀 선택 -->
+            <p class="text-[10px] font-black uppercase tracking-widest mb-2" style="color:var(--text-muted);">팀 선택</p>
+            <div class="flex gap-2 mb-4">
+                <button id="direct-team-a" onclick="setDirectTeam('A')" class="flex-1 py-3 rounded-xl font-bold text-sm transition">TEAM A</button>
+                <button id="direct-team-b" onclick="setDirectTeam('B')" class="flex-1 py-3 rounded-xl font-bold text-sm transition">TEAM B</button>
+            </div>
+
+            <!-- +/- 토글 -->
+            <p class="text-[10px] font-black uppercase tracking-widest mb-2" style="color:var(--text-muted);">부호</p>
+            <div class="flex gap-2 mb-4">
+                <button id="direct-plus" onclick="setDirectSign(1)" class="flex-1 py-3 rounded-xl font-black text-base transition">+</button>
+                <button id="direct-minus" onclick="setDirectSign(-1)" class="flex-1 py-3 rounded-xl font-black text-base transition">−</button>
+            </div>
+
+            <!-- 점수 입력 -->
+            <p class="text-[10px] font-black uppercase tracking-widest mb-2" style="color:var(--text-muted);">점수</p>
+            <div class="relative rounded-xl mb-4" style="background-color:var(--bg-card-sub); border:1px solid var(--border);">
+                <span id="direct-sign-label" class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-black" style="color:var(--text-muted);">+</span>
+                <input id="direct-score" type="number" inputmode="numeric" placeholder="0"
+                    class="w-full px-4 py-3 text-2xl font-black outline-none text-center bg-transparent"
+                    style="color:var(--text-primary);"
+                    oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+            </div>
+
+            <!-- 배지 입력 -->
+            <p class="text-[10px] font-black uppercase tracking-widest mb-2" style="color:var(--text-muted);">메모 배지 <span style="font-weight:400;">(선택)</span></p>
+            <input id="direct-badge" type="text" placeholder="입력하지 않으면 배지 없음"
+                class="w-full rounded-xl px-4 py-3 text-sm mb-6 outline-none"
+                style="background-color:var(--bg-card-sub); color:var(--text-primary); border:1px solid var(--border);">
+
+            <!-- 저장 / 취소 -->
+            <div class="flex gap-2">
+                <button onclick="closeDirectModal()" class="flex-none text-sm font-bold py-3 px-5 rounded-xl transition" style="background-color:var(--bg-card-sub); color:var(--text-muted);">취소</button>
+                <button onclick="saveDirectRound()" class="flex-1 text-sm font-bold py-3 rounded-xl text-white transition" style="background-color:#10B981; box-shadow:0 4px 12px rgba(16,185,129,0.3);">저장하기</button>
             </div>
         </div>
     </div>
@@ -629,7 +699,7 @@
             else if (e.type === 'grand' && e.success) { bg = '#EDE9FE'; color = '#6D28D9'; }
             else { bg = '#FEE2E2'; color = '#991B1B'; }
             const tag = document.createElement('span');
-            tag.className = 'text-xs font-bold px-2 py-0.5 rounded-lg flex items-center gap-1 cursor-pointer active:scale-95 transition';
+            tag.className = 'text-xs font-bold px-4 py-1.5 rounded-lg flex items-center gap-1 cursor-pointer active:scale-95 transition event-tag';
             tag.style.cssText = `background-color:${bg}; color:${color};`;
             tag.onclick = () => removeEventByIndex(i);
             tag.innerHTML = `${text} <span style="opacity:0.6; font-size:0.75rem; line-height:1;">✕</span>`;
@@ -659,17 +729,24 @@
             round.events.forEach(e => {
                 const p = [...matchData.team_a_players, ...matchData.team_b_players].find(x => x.id === e.player_id);
                 let badgeClass;
+                if (e.type === 'custom') {
+                    eventBadges += `<span class="text-xs font-bold px-2 py-0.5 rounded-lg round-badge" style="background-color:var(--bg-card-sub); color:var(--text-secondary);">${e.text}</span>`;
+                    return;
+                }
                 if (e.type === 'one_two') badgeClass = 'bg-emerald-100 text-emerald-700';
                 else if (e.type === 'tichu' && e.success) badgeClass = 'bg-yellow-100 text-yellow-700';
                 else if (e.type === 'grand' && e.success) badgeClass = 'bg-violet-100 text-violet-700';
                 else badgeClass = 'bg-red-100 text-red-700';
                 let text = e.type === 'one_two' ? `${e.team === 'A' ? 'A팀' : 'B팀'} 원투` : `${p ? p.name : ''} ${e.type === 'tichu' ? '티츄' : '라지'} ${e.success ? '성공' : '실패'}`;
-                eventBadges += `<span class="text-xs font-bold px-2 py-0.5 rounded-lg ${badgeClass}">${text}</span>`;
+                eventBadges += `<span class="text-xs font-bold px-2 py-0.5 rounded-lg round-badge ${badgeClass}">${text}</span>`;
             });
             div.innerHTML = `
                 <div class="relative">
                     <span class="text-xs font-bold round-label">ROUND ${round.round_number}</span>
-                    <button onclick="loadRoundToPanel(${round.round_number})" class="absolute right-0 top-0 text-[10px] font-bold px-2 py-0.5 rounded-full transition" style="background-color:var(--bg-card-sub); color:var(--text-muted);">수정</button>
+                    <div class="absolute right-0 top-0 flex gap-1.5">
+                        <button onclick="${round.direct ? `openDirectModal(${round.round_number})` : `loadRoundToPanel(${round.round_number})`}" class="text-xs font-bold px-3 py-1.5 rounded-full transition min-w-[52px] round-edit-btn">수정</button>
+                        <button onclick="deleteRound(${round.round_number})" class="text-xs font-bold px-3 py-1.5 rounded-full transition min-w-[52px] round-delete-btn">삭제</button>
+                    </div>
                     <div class="flex justify-center items-center gap-3 -mt-4">
                         <span class="text-2xl font-black round-score-a">${round.team_a_total}</span>
                         <span style="color:var(--text-muted); font-size:0.75rem;">vs</span>
@@ -682,6 +759,112 @@
     }
 
     function removeEvent(i) { removeEventByIndex(i); }
+
+    // ── 직접 입력 모달 ──
+    let directState = { team: 'A', sign: 1, editingRound: null };
+
+    function openDirectModal(roundNumber = null) {
+        directState = { team: 'A', sign: 1, editingRound: roundNumber };
+        document.getElementById('direct-score').value = '';
+        document.getElementById('direct-badge').value = '';
+
+        if (roundNumber !== null) {
+            const round = matchData.rounds.find(r => r.round_number === roundNumber);
+            if (round) {
+                if (round.team_a_base_score !== 0) {
+                    directState.team = 'A';
+                    directState.sign = round.team_a_base_score >= 0 ? 1 : -1;
+                    document.getElementById('direct-score').value = Math.abs(round.team_a_base_score);
+                } else {
+                    directState.team = 'B';
+                    directState.sign = round.team_b_base_score >= 0 ? 1 : -1;
+                    document.getElementById('direct-score').value = Math.abs(round.team_b_base_score);
+                }
+                const customEvent = round.events.find(e => e.type === 'custom');
+                document.getElementById('direct-badge').value = customEvent ? customEvent.text : '';
+            }
+        }
+
+        updateDirectTeamUI();
+        updateDirectSignUI();
+        document.getElementById('direct-modal').classList.remove('hidden');
+    }
+
+    function closeDirectModal() {
+        document.getElementById('direct-modal').classList.add('hidden');
+    }
+
+    function setDirectTeam(team) { directState.team = team; updateDirectTeamUI(); }
+    function setDirectSign(sign) { directState.sign = sign; updateDirectSignUI(); }
+
+    function updateDirectTeamUI() {
+        const btnA = document.getElementById('direct-team-a');
+        const btnB = document.getElementById('direct-team-b');
+        btnA.style.cssText = directState.team === 'A'
+            ? 'background-color:rgba(79,70,229,0.30); color:#4338CA; font-weight:700;'
+            : 'background-color:var(--bg-card-sub); color:var(--text-muted); font-weight:700;';
+        btnB.style.cssText = directState.team === 'B'
+            ? 'background-color:rgba(244,63,94,0.30); color:#E11D48; font-weight:700;'
+            : 'background-color:var(--bg-card-sub); color:var(--text-muted); font-weight:700;';
+    }
+
+    function updateDirectSignUI() {
+        const btnPlus = document.getElementById('direct-plus');
+        const btnMinus = document.getElementById('direct-minus');
+        const signLabel = document.getElementById('direct-sign-label');
+        btnPlus.style.cssText = directState.sign === 1
+            ? 'background-color:rgba(99,102,241,0.15); color:#818CF8; font-weight:700;'
+            : 'background-color:var(--bg-card-sub); color:var(--text-muted); font-weight:700;';
+        btnMinus.style.cssText = directState.sign === -1
+            ? 'background-color:rgba(251,113,133,0.15); color:#FB7185; font-weight:700;'
+            : 'background-color:var(--bg-card-sub); color:var(--text-muted); font-weight:700;';
+        signLabel.textContent = directState.sign === -1 ? '−' : '+';
+    }
+
+    async function saveDirectRound() {
+        const scoreVal = document.getElementById('direct-score').value;
+        if (!scoreVal) { alert('점수를 입력해주세요.'); return; }
+
+        const score = parseInt(scoreVal) * directState.sign;
+        const badgeText = document.getElementById('direct-badge').value.trim();
+        const events = badgeText ? [{ type: 'custom', text: badgeText }] : [];
+        const roundNumber = directState.editingRound ?? (matchData.rounds.length > 0 ? Math.max(...matchData.rounds.map(r => r.round_number)) + 1 : 1);
+
+        const data = {
+            round_number: roundNumber,
+            team_a_base_score: directState.team === 'A' ? score : 0,
+            team_b_base_score: directState.team === 'B' ? score : 0,
+            events,
+            direct: true
+        };
+
+        try {
+            const res = await fetch(`/api/matches/${matchId}/rounds`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+            if (!res.ok) throw new Error((await res.json()).detail);
+            matchData = await res.json();
+            renderTeamInfo();
+            renderRounds();
+            resetInput();
+            closeDirectModal();
+            if (matchData.winner_team) showVictoryModal();
+        } catch (e) {
+            alert('저장 실패: ' + e.message);
+        }
+    }
+
+    async function deleteRound(roundNumber) {
+        if (!confirm(`ROUND ${roundNumber}을 삭제하시겠습니까?`)) return;
+        try {
+            const res = await fetch(`/api/matches/${matchId}/rounds/${roundNumber}`, { method: 'DELETE' });
+            if (!res.ok) throw new Error((await res.json()).detail);
+            matchData = await fetch(`/api/matches/${matchId}`).then(r => r.json());
+            renderTeamInfo();
+            renderRounds();
+            resetInput();
+        } catch (e) {
+            alert('삭제 실패: ' + e.message);
+        }
+    }
 
     function resetInput() {
         events = [];

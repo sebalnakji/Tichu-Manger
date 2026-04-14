@@ -307,7 +307,8 @@ def get_match_detail(match_id: int, db: Session = Depends(get_db)):
             "team_b_total": result["team_b_total"],
             "team_a_bonus": result["team_a_bonus"],
             "team_b_bonus": result["team_b_bonus"],
-            "events": round_data.get("events", [])
+            "events": round_data.get("events", []),
+            "direct": round_data.get("direct", False)
         })
 
     return MatchDetailResponse(
@@ -356,7 +357,8 @@ def add_round_score(
         "round": round_data.round_number,
         "team_a_base": round_data.team_a_base_score,
         "team_b_base": round_data.team_b_base_score,
-        "events": [event.model_dump() for event in round_data.events]
+        "events": [event.model_dump() for event in round_data.events],
+        "direct": round_data.direct
     }
 
     # 기존 라운드 목록 가져오기
