@@ -9,10 +9,11 @@ from datetime import date
 
 class RoundEvent(BaseModel):
     """라운드 내 개별 이벤트"""
-    type: Literal["tichu", "grand", "one_two"]
+    type: Literal["tichu", "grand", "one_two", "custom"]
     player_id: Optional[int] = None  # 티츄/라티인 경우 필수
     team: Optional[str] = None  # 원투인 경우 "A" or "B"
     success: Optional[bool] = None  # 티츄/라티 성공 여부
+    text: Optional[str] = None  # 커스텀 배지 텍스트
 
 
 class RoundScoreRequest(BaseModel):
@@ -21,6 +22,7 @@ class RoundScoreRequest(BaseModel):
     team_a_base_score: int
     team_b_base_score: int
     events: List[RoundEvent] = []
+    direct: bool = False  # 직접 입력 여부
 
 
 class RoundScoreResponse(BaseModel):
@@ -33,6 +35,7 @@ class RoundScoreResponse(BaseModel):
     team_a_bonus: int  # 보너스 점수
     team_b_bonus: int
     events: List[RoundEvent]
+    direct: bool = False  # 직접 입력 여부
 
 
 class PlayerInfo(BaseModel):
