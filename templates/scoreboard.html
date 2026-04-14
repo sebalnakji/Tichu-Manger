@@ -743,9 +743,9 @@
             div.innerHTML = `
                 <div class="relative">
                     <span class="text-xs font-bold round-label">ROUND ${round.round_number}</span>
-                    <div class="absolute right-0 top-0 flex gap-1.5">
-                        <button onclick="${round.direct ? `openDirectModal(${round.round_number})` : `loadRoundToPanel(${round.round_number})`}" class="text-xs font-bold px-3 py-1.5 rounded-full transition min-w-[52px] round-edit-btn">수정</button>
-                        <button onclick="deleteRound(${round.round_number})" class="text-xs font-bold px-3 py-1.5 rounded-full transition min-w-[52px] round-delete-btn">삭제</button>
+                    <div class="absolute right-0 top-0 flex flex-col gap-1">
+                        <button onclick="${round.direct ? `openDirectModal(${round.round_number})` : `loadRoundToPanel(${round.round_number})`}" class="text-xs font-bold px-2 py-1 rounded-full transition round-edit-btn">수정</button>
+                        <button onclick="deleteRound(${round.round_number})" class="text-xs font-bold px-2 py-1 rounded-full transition round-delete-btn">삭제</button>
                     </div>
                     <div class="flex justify-center items-center gap-3 -mt-4">
                         <span class="text-2xl font-black round-score-a">${round.team_a_total}</span>
