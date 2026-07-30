@@ -7,7 +7,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from typing import Generator
 
-from core.properties import settings
+from core.properties import settings, validate_required_settings
+
+validate_required_settings()
 
 # SQLAlchemy Engine 생성
 # check_same_thread=False: SQLite에서 멀티스레드 사용 허용

@@ -35,6 +35,9 @@ class Config:
     SUPABASE_URL: str = os.getenv("SUPABASE_URL", "")
     SUPABASE_KEY: str = os.getenv("SUPABASE_KEY", "")
     SUPABASE_BUCKET: str = os.getenv("SUPABASE_BUCKET", "tichu-profiles")
+    ENABLE_CLEANUP_SCHEDULER: bool = os.getenv(
+        "ENABLE_CLEANUP_SCHEDULER", "true"
+    ).lower() in {"1", "true", "yes", "on"}
 
 
 class LocalConfig(Config):
@@ -60,6 +63,9 @@ class ProdConfig(Config):
 
     # Storage (Supabase Storage)
     STORAGE_TYPE: str = "supabase"
+    ENABLE_CLEANUP_SCHEDULER: bool = os.getenv(
+        "ENABLE_CLEANUP_SCHEDULER", "false"
+    ).lower() in {"1", "true", "yes", "on"}
 
 
 def get_settings():
@@ -76,3 +82,27 @@ def get_settings():
 
 # 전역 설정 객체
 settings = get_settings()
+
+
+def validate_required_settings() -> None:
+    """Fail fast with variable names only; never include secret values."""
+    if settings.ENV != Environment.PROD:
+        return
+
+    required = ("DATABASE_URL", "ADMIN_CODE", "SUPABASE_URL", "SUPABASE_KEY")
+    missing = [name for name in required if not getattr(settings, name, None)]
+    if missing:
+        raise RuntimeError(
+            "Missing required production environment variables: "
+            + ", ".join(missing)
+        )
+
+    if settings.ADMIN_CODE.strip().lower() in {
+        "admin",
+        "admin123",
+        "changeme",
+        "change-me-in-production",
+    }:
+        raise RuntimeError(
+            "ADMIN_CODE must be changed from the development default in production."
+        )

@@ -46,7 +46,7 @@ def create_player(player: PlayerCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_player)
 
-    logger.info(f"플레이어 생성: {new_player.name} (코드: {english_code})")
+    logger.info(f"플레이어 생성: {new_player.name}")
     return new_player
 
 
@@ -88,7 +88,7 @@ def update_player(
             )
 
         existing_player.code = english_code
-        logger.info(f"플레이어 코드 변경: {existing_player.name} → {english_code}")
+        logger.info(f"플레이어 코드 변경: {existing_player.name}")
 
     # 프로필 이미지 수정
     if player.profile_url is not None:
@@ -170,7 +170,7 @@ async def upload_profile_image(
     db.commit()
     db.refresh(player)
 
-    logger.info(f"프로필 이미지 업로드 완료: {player.name} → {public_url}")
+    logger.info(f"프로필 이미지 업로드 완료: {player.name}")
 
     return {
         "message": "프로필 이미지가 업로드되었습니다.",
