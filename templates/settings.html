@@ -347,6 +347,13 @@
 
         const codeInput = document.getElementById('edit-code');
         if (codeInput) AuthManager.preventSpace(codeInput);
+
+        const shouldOpenMatchEdit =
+            new URLSearchParams(window.location.search).get('open') === 'match-edit';
+        if (shouldOpenMatchEdit && AuthManager.isAdmin()) {
+            switchAdminTab('data');
+            showMatchEditModal();
+        }
     });
 
     // ── 프로필 이미지 ─────────────────────────────────
@@ -664,7 +671,7 @@
             matches.forEach(match => {
                 const isWinnerA = match.winner_team === 'A';
                 const div = document.createElement('a');
-                div.href = `/scoreboard/${match.id}`;
+                div.href = `/scoreboard/${match.id}?return_to=match-edit`;
                 div.className = 's-user-row flex flex-col p-4 rounded-2xl shadow-sm active:scale-95 transition block';
                 div.innerHTML = `
                     <div class="flex justify-between items-center mb-3">
