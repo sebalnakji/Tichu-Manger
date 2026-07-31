@@ -49,47 +49,24 @@ python main.py
 
 ## 성능 테스트
 
-### 테스트 조건
+2026-07-31 서울에서 각 엔드포인트를 10회 워밍업한 뒤 30회씩 순차 측정했습니다.
+아래 값은 응답 시간 중앙값(p50)이며 모든 요청이 성공했습니다.
 
-| 항목 | 조건 |
-|---|---|
-| 테스트 위치 | 대한민국 서울 |
-| 테스트 날짜 | 2026-07-31 |
-| 비교 환경 | Koyeb(US) + Supabase(US) / Render(SG) + Supabase(KR) |
-| 워밍업 | 환경·엔드포인트별 10회 |
-| 측정 | 환경·엔드포인트별 30회 |
-| 동시성 | 1 |
-| 타임아웃 | 30초 |
-| 실행 방식 | 각 환경을 독립적으로 순차 실행 |
-| 기준 코드 | 쿼리 최적화 커밋 `fd96b59` |
-
-### 최종 측정 결과
-
-단위는 ms이며, 워밍업 이후 측정값입니다.
-
-| 엔드포인트 | 환경 | 평균 | 중앙값 | 최소 | 최대 | p95 | 실패율 |
-|---|---|---:|---:|---:|---:|---:|---:|
-| `/health` | Koyeb(US) + Supabase(US) | 233.43 | 209.01 | 204.41 | 288.31 | 287.34 | 0.00% |
-| `/health` | Render(SG) + Supabase(KR) | 138.47 | 132.99 | 119.22 | 192.69 | 159.20 | 0.00% |
-| `/` | Koyeb(US) + Supabase(US) | 231.71 | 208.30 | 203.65 | 299.56 | 283.39 | 0.00% |
-| `/` | Render(SG) + Supabase(KR) | 121.99 | 120.64 | 112.14 | 136.25 | 130.96 | 0.00% |
-| `/api/players/` | Koyeb(US) + Supabase(US) | 251.43 | 231.81 | 216.75 | 316.84 | 313.13 | 0.00% |
-| `/api/players/` | Render(SG) + Supabase(KR) | 341.37 | 338.68 | 330.32 | 382.36 | 358.10 | 0.00% |
-| `/api/matches/finished` | Koyeb(US) + Supabase(US) | 309.92 | 310.94 | 230.23 | 858.81 | 316.92 | 0.00% |
-| `/api/matches/finished` | Render(SG) + Supabase(KR) | 489.94 | 477.25 | 470.16 | 826.02 | 487.46 | 0.00% |
-| `/api/stats/leaderboard` | Koyeb(US) + Supabase(US) | 359.77 | 302.32 | 268.49 | 956.89 | 681.68 | 0.00% |
-| `/api/stats/leaderboard` | Render(SG) + Supabase(KR) | 712.79 | 688.39 | 681.68 | 1079.16 | 888.62 | 0.00% |
-| `/api/players/{id}` | Koyeb(US) + Supabase(US) | 251.11 | 228.97 | 224.11 | 303.03 | 301.07 | 0.00% |
-| `/api/players/{id}` | Render(SG) + Supabase(KR) | 337.44 | 334.62 | 325.48 | 376.32 | 354.98 | 0.00% |
-
-### 종합 비교
-
-| 항목 | Koyeb(US) + Supabase(US) | Render(SG) + Supabase(KR) | 우세 환경 |
+| 엔드포인트 | Koyeb(US) + Supabase(US) | Render(SG) + Supabase(KR) | 더 빠른 환경 |
 |---|---:|---:|---|
-| 전체 엔드포인트 평균 p50 | 248.56ms | 348.76ms | Koyeb |
-| DB 엔드포인트 평균 p50 | 268.51ms | 459.74ms | Koyeb |
-| 전체 실패 | 0/180 | 0/180 | 동일 |
-| 단순 응답(`/health`, `/`) | 상대적으로 느림 | 상대적으로 빠름 | Render |
-| DB 중심 인게임 기능 | 상대적으로 빠름 | 상대적으로 느림 | Koyeb |
+| `/health` | 209.01ms | **132.99ms** | Render |
+| `/` | 208.30ms | **120.64ms** | Render |
+| `/api/players/` | **231.81ms** | 338.68ms | Koyeb |
+| `/api/matches/finished` | **310.94ms** | 477.25ms | Koyeb |
+| `/api/stats/leaderboard` | **302.32ms** | 688.39ms | Koyeb |
+| `/api/players/{id}` | **228.97ms** | 334.62ms | Koyeb |
 
-**최종 운영 환경: Koyeb(US) + Supabase(US)**
+| 요약 | Koyeb(US) + Supabase(US) | Render(SG) + Supabase(KR) |
+|---|---:|---:|
+| 전체 평균 p50 | **248.56ms** | 348.76ms |
+| DB 기능 평균 p50 | **268.51ms** | 459.74ms |
+| 실패 | 0/180 | 0/180 |
+
+Render는 단순 응답이 빠르지만, 실제 게임에서 사용하는 DB 중심 기능은 Koyeb가 더 빠릅니다.
+
+**최종 운영 환경은 Koyeb(US) + Supabase(US)입니다.**
