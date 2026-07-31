@@ -365,12 +365,29 @@ def add_round_score(
 
     logger.info(f"라운드 저장 요청: match_id={match_id}, round={round_data.round_number}")
 
+    event_data = [event.model_dump() for event in round_data.events]
+    try:
+        ScoreService.validate_round(
+            round_data.round_number,
+            round_data.team_a_base_score,
+            round_data.team_b_base_score,
+            event_data,
+            match.team_a_ids,
+            match.team_b_ids,
+            round_data.direct,
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(exc),
+        ) from exc
+
     # 라운드 데이터 구성
     new_round = {
         "round": round_data.round_number,
         "team_a_base": round_data.team_a_base_score,
         "team_b_base": round_data.team_b_base_score,
-        "events": [event.model_dump() for event in round_data.events],
+        "events": event_data,
         "direct": round_data.direct
     }
 
@@ -401,7 +418,7 @@ def add_round_score(
     ScoreService.save_round_stats(
         match_id,
         round_data.round_number,
-        [event.model_dump() for event in round_data.events],
+        event_data,
         db
     )
 

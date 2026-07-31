@@ -16,6 +16,66 @@ class ScoreService:
     """점수 계산 서비스"""
 
     @staticmethod
+    def validate_round(
+        round_number: int,
+        team_a_base: int,
+        team_b_base: int,
+        events: List[dict],
+        team_a_ids: List[int],
+        team_b_ids: List[int],
+        direct: bool = False,
+    ) -> None:
+        """DB에 저장하기 전에 라운드 입력 규칙을 검증한다."""
+        if round_number < 1:
+            raise ValueError("라운드 번호는 1 이상이어야 합니다.")
+
+        if direct:
+            if any(event["type"] != "custom" for event in events):
+                raise ValueError("직접 점수 입력에는 커스텀 메모만 추가할 수 있습니다.")
+            return
+
+        one_two_events = [event for event in events if event["type"] == "one_two"]
+        if len(one_two_events) > 1:
+            raise ValueError("원투는 라운드당 한 팀만 기록할 수 있습니다.")
+
+        if one_two_events:
+            if team_a_base != 0 or team_b_base != 0:
+                raise ValueError("원투 라운드의 기본 점수는 양 팀 모두 0점이어야 합니다.")
+        elif team_a_base + team_b_base != 100:
+            raise ValueError("기본 점수 합계는 100점이어야 합니다.")
+
+        participant_ids = set(team_a_ids + team_b_ids)
+        player_events = []
+        success_events = []
+
+        for event in events:
+            if event["type"] in ("tichu", "grand"):
+                player_id = event.get("player_id")
+                if player_id not in participant_ids:
+                    raise ValueError("티츄/라지티츄 플레이어는 해당 경기 참가자여야 합니다.")
+                if event.get("success") is None:
+                    raise ValueError("티츄/라지티츄의 성공 여부가 필요합니다.")
+                player_events.append(event)
+                if event["success"]:
+                    success_events.append(event)
+            elif event["type"] == "one_two" and event.get("team") not in ("A", "B"):
+                raise ValueError("원투 팀은 A 또는 B여야 합니다.")
+
+        player_ids = [event["player_id"] for event in player_events]
+        if len(player_ids) != len(set(player_ids)):
+            raise ValueError("한 플레이어의 티츄/라지티츄를 중복 기록할 수 없습니다.")
+
+        if len(success_events) > 1:
+            raise ValueError("티츄/라지티츄 성공은 라운드당 한 명만 가능합니다.")
+
+        if one_two_events and success_events:
+            one_two_team = one_two_events[0]["team"]
+            success_player_id = success_events[0]["player_id"]
+            success_team = "A" if success_player_id in team_a_ids else "B"
+            if success_team != one_two_team:
+                raise ValueError("원투 상대 팀은 티츄/라지티츄에 성공할 수 없습니다.")
+
+    @staticmethod
     def calculate_round_score(
         team_a_base: int,
         team_b_base: int,
@@ -175,12 +235,12 @@ class ScoreService:
         match.score_a = total_a
         match.score_b = total_b
 
-        # 1000점 도달 확인
-        if total_a >= 1000 or total_b >= 1000:
+        # 한 팀 이상이 1000점에 도달했더라도 동점이면 다음 라운드를 진행한다.
+        if (total_a >= 1000 or total_b >= 1000) and total_a != total_b:
             match.status = "FINISHED"
             match.winner_team = "A" if total_a > total_b else "B"
         else:
-            # 점수 수정으로 1000점 미만이 된 경우 → 게임 재개
+            # 점수 수정으로 종료 조건을 벗어나거나 동점이 된 경우 게임 재개
             if match.status == "FINISHED":
                 match.status = "PLAYING"
                 match.winner_team = None

@@ -1,7 +1,7 @@
 from datetime import date
 
 import pytest
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.testclient import TestClient
 from sqlalchemy import event
 
@@ -177,6 +177,162 @@ def test_round_can_finish_match(db, player_ids):
     persisted = db.query(Match).filter(Match.id == match_id).one()
     assert persisted.status == "FINISHED"
     assert persisted.winner_team == "A"
+
+
+def test_match_continues_when_scores_are_tied_at_1000(db, player_ids):
+    match_id = create_match(db, player_ids)
+
+    result = add_round_score(
+        match_id,
+        round_request(team_a=1000, team_b=1000, direct=True),
+        db,
+    )
+
+    assert result.status == "PLAYING"
+    assert result.winner_team is None
+    assert result.team_a_total_score == 1000
+    assert result.team_b_total_score == 1000
+
+    persisted = db.query(Match).filter(Match.id == match_id).one()
+    assert persisted.status == "PLAYING"
+    assert persisted.winner_team is None
+
+
+def test_valid_one_two_with_same_team_tichu_success_is_saved(db, player_ids):
+    match_id = create_match(db, player_ids)
+
+    result = add_round_score(
+        match_id,
+        round_request(
+            team_a=0,
+            team_b=0,
+            events=[
+                RoundEvent(type="one_two", team="A"),
+                RoundEvent(
+                    type="tichu",
+                    player_id=player_ids[0],
+                    success=True,
+                ),
+            ],
+        ),
+        db,
+    )
+
+    assert result.team_a_total_score == 300
+    assert result.team_b_total_score == 0
+
+
+@pytest.mark.parametrize(
+    ("request_data", "message"),
+    [
+        (
+            round_request(team_a=70, team_b=20),
+            "기본 점수 합계는 100점이어야 합니다.",
+        ),
+        (
+            round_request(
+                events=[RoundEvent(type="tichu", player_id=999, success=True)]
+            ),
+            "해당 경기 참가자여야 합니다.",
+        ),
+        (
+            round_request(
+                events=[
+                    RoundEvent(type="tichu", player_id=1, success=False),
+                    RoundEvent(type="grand", player_id=1, success=False),
+                ]
+            ),
+            "중복 기록할 수 없습니다.",
+        ),
+        (
+            round_request(
+                events=[
+                    RoundEvent(type="tichu", player_id=1, success=True),
+                    RoundEvent(type="grand", player_id=3, success=True),
+                ]
+            ),
+            "라운드당 한 명만 가능합니다.",
+        ),
+        (
+            round_request(
+                team_a=0,
+                team_b=0,
+                events=[
+                    RoundEvent(type="one_two", team="A"),
+                    RoundEvent(type="tichu", player_id=3, success=True),
+                ],
+            ),
+            "원투 상대 팀은",
+        ),
+        (
+            round_request(
+                team_a=0,
+                team_b=0,
+                events=[
+                    RoundEvent(type="one_two", team="A"),
+                    RoundEvent(type="one_two", team="B"),
+                ],
+            ),
+            "라운드당 한 팀만",
+        ),
+        (
+            round_request(
+                events=[RoundEvent(type="one_two", team="A")],
+            ),
+            "양 팀 모두 0점",
+        ),
+        (
+            round_request(
+                team_a=0,
+                team_b=0,
+                events=[RoundEvent(type="one_two", team="invalid")],
+            ),
+            "A 또는 B",
+        ),
+        (
+            round_request(
+                events=[RoundEvent(type="tichu", player_id=1)],
+            ),
+            "성공 여부가 필요합니다.",
+        ),
+        (
+            round_request(number=0),
+            "라운드 번호는 1 이상",
+        ),
+        (
+            round_request(
+                events=[RoundEvent(type="tichu", player_id=1, success=True)],
+                direct=True,
+            ),
+            "커스텀 메모만",
+        ),
+    ],
+)
+def test_invalid_round_is_rejected_without_saving(
+    db,
+    player_ids,
+    request_data,
+    message,
+):
+    match_id = create_match(db, player_ids)
+
+    # Parametrized IDs are normalized to the fixture's actual player IDs.
+    for event_data in request_data.events:
+        if event_data.player_id == 1:
+            event_data.player_id = player_ids[0]
+        elif event_data.player_id == 3:
+            event_data.player_id = player_ids[2]
+
+    with pytest.raises(HTTPException) as exc_info:
+        add_round_score(match_id, request_data, db)
+
+    assert exc_info.value.status_code == 422
+    assert message in exc_info.value.detail
+    persisted = db.query(Match).filter(Match.id == match_id).one()
+    assert persisted.rounds == []
+    assert persisted.score_a == 0
+    assert persisted.score_b == 0
+    assert db.query(MatchStats).filter(MatchStats.match_id == match_id).count() == 0
 
 
 def test_round_failure_does_not_partially_commit(
