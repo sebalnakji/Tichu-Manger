@@ -28,6 +28,12 @@ class Config:
     HOST: str = os.getenv("HOST", "0.0.0.0")
     PORT: int = int(os.getenv("PORT", "8000"))
 
+    # Database connection pool
+    DB_POOL_SIZE: int = int(os.getenv("DB_POOL_SIZE", "3"))
+    DB_MAX_OVERFLOW: int = int(os.getenv("DB_MAX_OVERFLOW", "2"))
+    DB_POOL_TIMEOUT: int = int(os.getenv("DB_POOL_TIMEOUT", "10"))
+    DB_POOL_RECYCLE: int = int(os.getenv("DB_POOL_RECYCLE", "300"))
+
     # Auth
     ADMIN_CODE: str = os.getenv("ADMIN_CODE", "admin123")
 

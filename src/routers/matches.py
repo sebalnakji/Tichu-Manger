@@ -111,23 +111,31 @@ def get_finished_matches(
         Match.status == "FINISHED"
     ).order_by(Match.id.desc()).limit(limit).all()
 
+    player_ids = {
+        player_id
+        for match in matches
+        for player_id in match.team_a_ids + match.team_b_ids
+    }
+    players = (
+        db.query(Player).filter(Player.id.in_(player_ids)).all()
+        if player_ids
+        else []
+    )
+    player_names = {player.id: player.name for player in players}
+
     result = []
     for match in matches:
-        team_a_names = []
-        for pid in match.team_a_ids:
-            player = db.query(Player).filter(Player.id == pid).first()
-            team_a_names.append(player.name if player else "알 수 없음")
-
-        team_b_names = []
-        for pid in match.team_b_ids:
-            player = db.query(Player).filter(Player.id == pid).first()
-            team_b_names.append(player.name if player else "알 수 없음")
-
         result.append({
             "id": match.id,
             "play_date": match.play_date.isoformat(),
-            "team_a_names": team_a_names,
-            "team_b_names": team_b_names,
+            "team_a_names": [
+                player_names.get(player_id, "알 수 없음")
+                for player_id in match.team_a_ids
+            ],
+            "team_b_names": [
+                player_names.get(player_id, "알 수 없음")
+                for player_id in match.team_b_ids
+            ],
             "score_a": match.score_a,
             "score_b": match.score_b,
             "winner_team": match.winner_team

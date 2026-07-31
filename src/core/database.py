@@ -13,11 +13,20 @@ validate_required_settings()
 
 # SQLAlchemy Engine 생성
 # check_same_thread=False: SQLite에서 멀티스레드 사용 허용
-engine = create_engine(
-    settings.DATABASE_URL,
-    connect_args={"check_same_thread": False} if "sqlite" in settings.DATABASE_URL else {},
-    echo=settings.DEBUG  # DEBUG 모드에서 SQL 쿼리 로그 출력
-)
+engine_options = {"echo": settings.DEBUG}
+if "sqlite" in settings.DATABASE_URL:
+    engine_options["connect_args"] = {"check_same_thread": False}
+else:
+    # Supabase session pool의 연결 한도를 넘지 않도록 프로세스당 상한을 제한한다.
+    engine_options.update(
+        pool_size=settings.DB_POOL_SIZE,
+        max_overflow=settings.DB_MAX_OVERFLOW,
+        pool_timeout=settings.DB_POOL_TIMEOUT,
+        pool_recycle=settings.DB_POOL_RECYCLE,
+        pool_pre_ping=True,
+    )
+
+engine = create_engine(settings.DATABASE_URL, **engine_options)
 
 # Session Factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

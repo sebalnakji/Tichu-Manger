@@ -8,7 +8,6 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 
 from core.database import get_db
-from models.models import Player
 from dto.stats import PlayerStats, LeaderboardResponse, TeamLeaderboardResponse
 from services.stats_service import StatsService
 
@@ -40,15 +39,7 @@ def get_all_players_stats_current_year(db: Session = Depends(get_db)):
     팀 선택 화면에서 승률 표시용
     """
     current_year = datetime.now().year
-    players = db.query(Player).all()
-
-    stats_list = []
-    for player in players:
-        stats = StatsService.get_player_stats(player.id, db, current_year)
-        if stats:
-            stats_list.append(stats)
-
-    return stats_list
+    return StatsService.get_all_player_stats(db, current_year)
 
 
 @router.get("/leaderboard", response_model=List[LeaderboardResponse])
