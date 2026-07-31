@@ -2,7 +2,17 @@
 SQLAlchemy ORM 모델
 티츄 매니저의 모든 데이터베이스 테이블 정의
 """
-from sqlalchemy import Column, Integer, String, DateTime, Date, JSON, Boolean, ForeignKey
+from sqlalchemy import (
+    Boolean,
+    Column,
+    Date,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    JSON,
+    String,
+)
 from datetime import datetime, date
 
 from core.database import Base
@@ -31,6 +41,10 @@ class Player(Base):
 class Match(Base):
     """게임 매치 기록"""
     __tablename__ = "tichu_matches"
+    __table_args__ = (
+        Index("ix_tichu_matches_status_id", "status", "id"),
+        Index("ix_tichu_matches_status_play_date", "status", "play_date"),
+    )
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     play_date = Column(Date, default=date.today, nullable=False, comment="게임 날짜")
@@ -79,6 +93,19 @@ class MatchStats(Base):
     라운드별로 기록
     """
     __tablename__ = "tichu_match_stats"
+    __table_args__ = (
+        Index(
+            "ix_tichu_match_stats_match_round",
+            "match_id",
+            "round_number",
+        ),
+        Index("ix_tichu_match_stats_player", "player_id"),
+        Index(
+            "ix_tichu_match_stats_match_player",
+            "match_id",
+            "player_id",
+        ),
+    )
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
 

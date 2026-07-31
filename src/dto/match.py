@@ -74,6 +74,16 @@ class MatchDetailResponse(BaseModel):
     winner_team: Optional[str]
 
 
+class MatchStateResponse(BaseModel):
+    """라운드 변경 후 프런트에서 갱신할 경기 상태"""
+    id: int
+    status: str
+    team_a_total_score: int
+    team_b_total_score: int
+    rounds: List[RoundScoreResponse]
+    winner_team: Optional[str]
+
+
 class TeamAssignment(BaseModel):
     """팀 배정 결과"""
     team_a: List[int]

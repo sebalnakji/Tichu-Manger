@@ -2,8 +2,9 @@
 Stats Service
 통계 계산 및 랭킹 로직
 """
+from datetime import date
 from typing import List, Optional
-from sqlalchemy import extract, or_
+
 from sqlalchemy.orm import Session
 from itertools import combinations
 
@@ -13,6 +14,18 @@ from dto.stats import PlayerStats, TeamStats
 
 class StatsService:
     """통계 계산 서비스"""
+
+    @staticmethod
+    def _year_bounds(year: int) -> tuple[date, date]:
+        return date(year, 1, 1), date(year + 1, 1, 1)
+
+    @staticmethod
+    def _filter_query_by_year(query, column, year: Optional[int]):
+        if not year:
+            return query
+
+        start_date, end_date = StatsService._year_bounds(year)
+        return query.filter(column >= start_date, column < end_date)
 
     @staticmethod
     def _build_player_stats(
@@ -94,25 +107,114 @@ class StatsService:
     @staticmethod
     def _get_finished_matches(db: Session, year: Optional[int]) -> List[Match]:
         query = db.query(Match).filter(Match.status == "FINISHED")
-        if year:
-            query = query.filter(extract("year", Match.play_date) == year)
+        query = StatsService._filter_query_by_year(query, Match.play_date, year)
         return query.all()
 
     @staticmethod
     def _get_recent_matches(db: Session, year: Optional[int]) -> List[Match]:
         query = db.query(Match).filter(Match.status == "FINISHED")
-        if year:
-            query = query.filter(extract("year", Match.play_date) == year)
-        return query.order_by(Match.play_date.desc()).limit(20).all()
+        query = StatsService._filter_query_by_year(query, Match.play_date, year)
+        return query.order_by(Match.play_date.desc(), Match.id.desc()).limit(20).all()
 
     @staticmethod
     def _get_match_stats(db: Session, year: Optional[int]) -> List[MatchStats]:
-        query = db.query(MatchStats)
+        query = db.query(MatchStats).join(Match).filter(
+            Match.status == "FINISHED"
+        )
         if year:
-            query = query.join(Match).filter(
-                extract("year", Match.play_date) == year
+            query = StatsService._filter_query_by_year(
+                query,
+                Match.play_date,
+                year,
             )
         return query.all()
+
+    @staticmethod
+    def get_match_context_stats(
+        team_a_ids: List[int],
+        team_b_ids: List[int],
+        db: Session,
+        year: int,
+    ):
+        """점수판에 필요한 선수·개인·팀 통계를 세 번의 조회로 계산한다."""
+        player_ids = list(dict.fromkeys(team_a_ids + team_b_ids))
+        players = db.query(Player).filter(Player.id.in_(player_ids)).all()
+        players_by_id = {player.id: player for player in players}
+
+        finished_matches = (
+            db.query(Match)
+            .filter(Match.status == "FINISHED")
+            .order_by(Match.play_date.desc(), Match.id.desc())
+            .all()
+        )
+        all_stats = (
+            db.query(MatchStats)
+            .filter(MatchStats.player_id.in_(player_ids))
+            .all()
+        )
+
+        year_matches = [
+            match for match in finished_matches if match.play_date.year == year
+        ]
+        year_match_ids = {match.id for match in year_matches}
+        recent_matches = year_matches[:20]
+
+        player_stats = {}
+        for player_id, player in players_by_id.items():
+            player_tichu_stats = [
+                stat
+                for stat in all_stats
+                if stat.player_id == player_id
+                and stat.match_id in year_match_ids
+            ]
+            player_stats[player_id] = StatsService._build_player_stats(
+                player,
+                year_matches,
+                recent_matches,
+                player_tichu_stats,
+            )
+
+        def build_team_stats(team_ids: List[int]) -> Optional[TeamStats]:
+            if len(team_ids) != 2:
+                return None
+
+            player1 = players_by_id.get(team_ids[0])
+            player2 = players_by_id.get(team_ids[1])
+            if not player1 or not player2:
+                return None
+
+            team_matches = [
+                match
+                for match in finished_matches
+                if (
+                    player1.id in match.team_a_ids
+                    and player2.id in match.team_a_ids
+                )
+                or (
+                    player1.id in match.team_b_ids
+                    and player2.id in match.team_b_ids
+                )
+            ]
+            team_match_ids = {match.id for match in team_matches}
+            team_tichu_stats = [
+                stat
+                for stat in all_stats
+                if stat.match_id in team_match_ids
+                and stat.player_id in {player1.id, player2.id}
+            ]
+            return StatsService._build_team_stats(
+                player1,
+                player2,
+                team_matches,
+                team_tichu_stats,
+            )
+
+        return (
+            players_by_id,
+            player_stats,
+            build_team_stats(team_a_ids),
+            build_team_stats(team_b_ids),
+        )
 
     @staticmethod
     def get_all_player_stats(
@@ -162,10 +264,19 @@ class StatsService:
 
         matches = StatsService._get_finished_matches(db, year)
         recent_matches = StatsService._get_recent_matches(db, year)
-        stats_query = db.query(MatchStats).filter(MatchStats.player_id == player_id)
+        stats_query = (
+            db.query(MatchStats)
+            .join(Match)
+            .filter(
+                MatchStats.player_id == player_id,
+                Match.status == "FINISHED",
+            )
+        )
         if year:
-            stats_query = stats_query.join(Match).filter(
-                extract("year", Match.play_date) == year
+            stats_query = StatsService._filter_query_by_year(
+                stats_query,
+                Match.play_date,
+                year,
             )
         tichu_stats = stats_query.all()
 
@@ -260,92 +371,45 @@ class StatsService:
         Returns:
             TeamStats: 팀 통계 또는 None
         """
-        # 플레이어 정보 조회
-        player1 = db.query(Player).filter(Player.id == player1_id).first()
-        player2 = db.query(Player).filter(Player.id == player2_id).first()
-
+        players = db.query(Player).filter(
+            Player.id.in_([player1_id, player2_id])
+        ).all()
+        players_by_id = {player.id: player for player in players}
+        player1 = players_by_id.get(player1_id)
+        player2 = players_by_id.get(player2_id)
         if not player1 or not player2:
             return None
 
-        # 팀 이름 생성 (가나다순)
-        names = sorted([player1.name, player2.name])
-        team_name = f"{names[0]}/{names[1]} 팀"
-
-        # 연도 필터링
-        query = db.query(Match).filter(Match.status == "FINISHED")
-        if year:
-            query = query.filter(extract('year', Match.play_date) == year)
-
-        matches = query.all()
-
-        # 두 사람이 같은 팀이었던 매치 찾기 (순서 무관)
-        total_games = 0
-        wins = 0
-        losses = 0
-        match_ids = []
-
-        for match in matches:
-            # team_a에 두 사람이 모두 있는지 확인
-            if player1_id in match.team_a_ids and player2_id in match.team_a_ids:
-                total_games += 1
-                match_ids.append(match.id)
-                if match.winner_team == "A":
-                    wins += 1
-                else:
-                    losses += 1
-            # team_b에 두 사람이 모두 있는지 확인
-            elif player1_id in match.team_b_ids and player2_id in match.team_b_ids:
-                total_games += 1
-                match_ids.append(match.id)
-                if match.winner_team == "B":
-                    wins += 1
-                else:
-                    losses += 1
-
-        # 티츄 통계 (두 사람 합산)
-        if match_ids:
-            stats_query = db.query(MatchStats).filter(
-                MatchStats.match_id.in_(match_ids),
-                or_(MatchStats.player_id == player1_id, MatchStats.player_id == player2_id)
+        matches = StatsService._get_finished_matches(db, year)
+        team_matches = [
+            match
+            for match in matches
+            if (
+                player1_id in match.team_a_ids
+                and player2_id in match.team_a_ids
             )
+            or (
+                player1_id in match.team_b_ids
+                and player2_id in match.team_b_ids
+            )
+        ]
+        match_ids = {match.id for match in team_matches}
+        tichu_stats = (
+            db.query(MatchStats)
+            .filter(
+                MatchStats.match_id.in_(match_ids),
+                MatchStats.player_id.in_([player1_id, player2_id]),
+            )
+            .all()
+            if match_ids
+            else []
+        )
 
-            tichu_stats = stats_query.all()
-
-            tichu_try = sum(1 for s in tichu_stats if s.is_tichu_try)
-            tichu_success = sum(1 for s in tichu_stats if s.is_tichu_succ)
-            grand_try = sum(1 for s in tichu_stats if s.is_grand_try)
-            grand_success = sum(1 for s in tichu_stats if s.is_grand_succ)
-        else:
-            tichu_try = tichu_success = grand_try = grand_success = 0
-
-        # 비율 계산
-        win_rate = (wins / total_games * 100) if total_games > 0 else 0.0
-        tichu_success_rate = (tichu_success / tichu_try * 100) if tichu_try > 0 else 0.0
-        grand_success_rate = (grand_success / grand_try * 100) if grand_try > 0 else 0.0
-
-        # ID 순서를 정규화 (작은 ID가 player1)
-        if player1_id > player2_id:
-            player1_id, player2_id = player2_id, player1_id
-            player1, player2 = player2, player1
-
-        return TeamStats(
-            player1_id=player1.id,
-            player2_id=player2.id,
-            player1_name=player1.name,
-            player2_name=player2.name,
-            player1_profile_url=player1.profile_url or '',
-            player2_profile_url=player2.profile_url or '',
-            team_name=team_name,
-            total_games=total_games,
-            wins=wins,
-            losses=losses,
-            win_rate=round(win_rate, 1),
-            tichu_try=tichu_try,  # 추가
-            tichu_success=tichu_success,  # 추가
-            tichu_success_rate=round(tichu_success_rate, 1),
-            grand_try=grand_try,  # 추가
-            grand_success=grand_success,  # 추가
-            grand_success_rate=round(grand_success_rate, 1),
+        return StatsService._build_team_stats(
+            player1,
+            player2,
+            team_matches,
+            tichu_stats,
         )
 
     @staticmethod

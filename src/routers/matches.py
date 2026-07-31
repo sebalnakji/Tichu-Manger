@@ -19,12 +19,48 @@ from dto.match import (
     MatchCreate,
     MatchResponse,
     MatchDetailResponse,
+    MatchStateResponse,
     RoundScoreRequest,
     PlayerInfo
 )
 
 router = APIRouter(prefix="/api/matches", tags=["Matches"])
 logger = get_logger(__name__)
+
+
+def _build_rounds(match: Match) -> list[dict]:
+    rounds = []
+    for round_data in match.rounds or []:
+        result = ScoreService.calculate_round_score(
+            round_data.get("team_a_base", 0),
+            round_data.get("team_b_base", 0),
+            round_data.get("events", []),
+            match.team_a_ids,
+            match.team_b_ids,
+        )
+        rounds.append({
+            "round_number": round_data.get("round"),
+            "team_a_base_score": round_data.get("team_a_base", 0),
+            "team_b_base_score": round_data.get("team_b_base", 0),
+            "team_a_total": result["team_a_total"],
+            "team_b_total": result["team_b_total"],
+            "team_a_bonus": result["team_a_bonus"],
+            "team_b_bonus": result["team_b_bonus"],
+            "events": round_data.get("events", []),
+            "direct": round_data.get("direct", False),
+        })
+    return rounds
+
+
+def _build_match_state(match: Match) -> MatchStateResponse:
+    return MatchStateResponse(
+        id=match.id,
+        status=match.status,
+        team_a_total_score=match.score_a,
+        team_b_total_score=match.score_b,
+        rounds=_build_rounds(match),
+        winner_team=match.winner_team,
+    )
 
 
 @router.post("/assign-teams")
@@ -164,19 +200,18 @@ def get_ongoing_matches(player_id: int, db: Session = Depends(get_db)):
     if player_id not in all_player_ids:
         return []  # 참여 안 한 게임이면 빈 배열
 
-    # 가장 최근 매치가 진행 중이고 플레이어가 참여한 경우
-    # 팀 플레이어 정보 조회
-    team_a_players = []
-    for pid in latest_match.team_a_ids:
-        player = db.query(Player).filter(Player.id == pid).first()
-        if player:
-            team_a_players.append({"id": player.id, "name": player.name})
-
-    team_b_players = []
-    for pid in latest_match.team_b_ids:
-        player = db.query(Player).filter(Player.id == pid).first()
-        if player:
-            team_b_players.append({"id": player.id, "name": player.name})
+    players = db.query(Player).filter(Player.id.in_(all_player_ids)).all()
+    players_by_id = {player.id: player for player in players}
+    team_a_players = [
+        {"id": players_by_id[pid].id, "name": players_by_id[pid].name}
+        for pid in latest_match.team_a_ids
+        if pid in players_by_id
+    ]
+    team_b_players = [
+        {"id": players_by_id[pid].id, "name": players_by_id[pid].name}
+        for pid in latest_match.team_b_ids
+        if pid in players_by_id
+    ]
 
     return [{
         "id": latest_match.id,
@@ -253,71 +288,36 @@ def get_match_detail(match_id: int, db: Session = Depends(get_db)):
             detail=f"매치 ID {match_id}를 찾을 수 없습니다."
         )
 
-    # 팀 A 플레이어 정보 조회
-    team_a_players = []
-    for player_id in match.team_a_ids:
-        player = db.query(Player).filter(Player.id == player_id).first()
-        if player:
-            stats = StatsService.get_player_stats(player_id, db, datetime.now().year)
-            team_a_players.append(PlayerInfo(
-                id=player.id,
-                name=player.name,
-                profile_url=player.profile_url,
-                win_rate=stats.win_rate if stats else 0.0,
-                recent_win_rate=stats.recent_win_rate if stats else 0.0
-            ))
-
-    # 팀 B 플레이어 정보 조회
-    team_b_players = []
-    for player_id in match.team_b_ids:
-        player = db.query(Player).filter(Player.id == player_id).first()
-        if player:
-            stats = StatsService.get_player_stats(player_id, db, datetime.now().year)
-            team_b_players.append(PlayerInfo(
-                id=player.id,
-                name=player.name,
-                profile_url=player.profile_url,
-                win_rate=stats.win_rate if stats else 0.0,
-                recent_win_rate=stats.recent_win_rate if stats else 0.0
-            ))
-
-    # 팀 A 승률
-    team_a_stats = StatsService.get_team_stats(
-        match.team_a_ids[0],
-        match.team_a_ids[1],
+    (
+        players_by_id,
+        stats_by_player_id,
+        team_a_stats,
+        team_b_stats,
+    ) = StatsService.get_match_context_stats(
+        match.team_a_ids,
+        match.team_b_ids,
         db,
-        year=None
+        datetime.now().year,
     )
 
-    # 팀 B 승률
-    team_b_stats = StatsService.get_team_stats(
-        match.team_b_ids[0],
-        match.team_b_ids[1],
-        db,
-        year=None
-    )
+    def build_players(player_ids: list[int]) -> list[PlayerInfo]:
+        result = []
+        for player_id in player_ids:
+            player = players_by_id.get(player_id)
+            if not player:
+                continue
+            stats = stats_by_player_id.get(player_id)
+            result.append(PlayerInfo(
+                id=player.id,
+                name=player.name,
+                profile_url=player.profile_url or "",
+                win_rate=stats.win_rate if stats else 0.0,
+                recent_win_rate=stats.recent_win_rate if stats else 0.0,
+            ))
+        return result
 
-    # 라운드 정보 구성
-    rounds = []
-    for round_data in match.rounds:
-        result = ScoreService.calculate_round_score(
-            round_data.get("team_a_base", 0),
-            round_data.get("team_b_base", 0),
-            round_data.get("events", []),
-            match.team_a_ids,
-            match.team_b_ids
-        )
-        rounds.append({
-            "round_number": round_data.get("round"),
-            "team_a_base_score": round_data.get("team_a_base", 0),
-            "team_b_base_score": round_data.get("team_b_base", 0),
-            "team_a_total": result["team_a_total"],
-            "team_b_total": result["team_b_total"],
-            "team_a_bonus": result["team_a_bonus"],
-            "team_b_bonus": result["team_b_bonus"],
-            "events": round_data.get("events", []),
-            "direct": round_data.get("direct", False)
-        })
+    team_a_players = build_players(match.team_a_ids)
+    team_b_players = build_players(match.team_b_ids)
 
     return MatchDetailResponse(
         id=match.id,
@@ -333,12 +333,12 @@ def get_match_detail(match_id: int, db: Session = Depends(get_db)):
         team_b_total_score=match.score_b,
         team_b_team_win_rate=team_b_stats.win_rate if team_b_stats else 0.0,
         team_b_team_games=team_b_stats.total_games if team_b_stats else 0,
-        rounds=rounds,
+        rounds=_build_rounds(match),
         winner_team=match.winner_team
     )
 
 
-@router.post("/{match_id}/rounds", response_model=MatchDetailResponse)
+@router.post("/{match_id}/rounds", response_model=MatchStateResponse)
 def add_round_score(
     match_id: int,
     round_data: RoundScoreRequest,
@@ -351,7 +351,12 @@ def add_round_score(
     - 총점 업데이트
     - 1000점 도달 시 게임 종료
     """
-    match = db.query(Match).filter(Match.id == match_id).first()
+    match = (
+        db.query(Match)
+        .filter(Match.id == match_id)
+        .with_for_update()
+        .first()
+    )
     if not match:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -370,7 +375,7 @@ def add_round_score(
     }
 
     # 기존 라운드 목록 가져오기
-    rounds_list = match.rounds if match.rounds else []
+    rounds_list = list(match.rounds or [])
 
     logger.info(f"기존 라운드 개수: {len(rounds_list)}")
 
@@ -393,12 +398,6 @@ def add_round_score(
     # ⭐ 중요: JSON 필드 변경을 SQLAlchemy에 알림
     flag_modified(match, "rounds")
 
-    db.commit()
-    db.refresh(match)
-
-    logger.info(f"저장 후 라운드 개수: {len(match.rounds)}")
-
-    # MatchStats 저장
     ScoreService.save_round_stats(
         match_id,
         round_data.round_number,
@@ -406,14 +405,16 @@ def add_round_score(
         db
     )
 
-    # 총점 업데이트
-    ScoreService.update_match_total_score(match_id, db)
+    ScoreService.update_match_total_score(match)
+    db.flush()
+    response = _build_match_state(match)
+    db.commit()
 
-    # 업데이트된 매치 정보 반환
-    return get_match_detail(match_id, db)
+    logger.info(f"저장 후 라운드 개수: {len(response.rounds)}")
+    return response
 
 
-@router.put("/{match_id}/rounds/{round_number}", response_model=MatchDetailResponse)
+@router.put("/{match_id}/rounds/{round_number}", response_model=MatchStateResponse)
 def update_round_score(
     match_id: int,
     round_number: int,
@@ -430,12 +431,20 @@ def update_round_score(
     return add_round_score(match_id, round_data, db)
 
 
-@router.delete("/{match_id}/rounds/{round_number}")
+@router.delete(
+    "/{match_id}/rounds/{round_number}",
+    response_model=MatchStateResponse,
+)
 def delete_round_score(match_id: int, round_number: int, db: Session = Depends(get_db)):
     """
     라운드 삭제
     """
-    match = db.query(Match).filter(Match.id == match_id).first()
+    match = (
+        db.query(Match)
+        .filter(Match.id == match_id)
+        .with_for_update()
+        .first()
+    )
     if not match:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -456,13 +465,13 @@ def delete_round_score(match_id: int, round_number: int, db: Session = Depends(g
         MatchStats.round_number == round_number
     ).delete()
 
+    ScoreService.update_match_total_score(match)
+    db.flush()
+    response = _build_match_state(match)
     db.commit()
 
-    # 총점 재계산
-    ScoreService.update_match_total_score(match_id, db)
-
     logger.info(f"라운드 {round_number} 삭제: 매치 ID {match_id}")
-    return {"message": f"라운드 {round_number}이 삭제되었습니다."}
+    return response
 
 
 @router.post("/{match_id}/reset")

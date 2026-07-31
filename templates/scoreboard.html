@@ -534,6 +534,10 @@
         } catch (error) { console.error('Error:', error); }
     }
 
+    function applyMatchState(state) {
+        matchData = { ...matchData, ...state };
+    }
+
     function renderTeamInfo() {
         document.getElementById('team-a-score').textContent = matchData.team_a_total_score;
         document.getElementById('team-b-score').textContent = matchData.team_b_total_score;
@@ -841,7 +845,7 @@
         try {
             const res = await fetch(`/api/matches/${matchId}/rounds`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
             if (!res.ok) throw new Error((await res.json()).detail);
-            matchData = await res.json();
+            applyMatchState(await res.json());
             renderTeamInfo();
             renderRounds();
             resetInput();
@@ -857,7 +861,7 @@
         try {
             const res = await fetch(`/api/matches/${matchId}/rounds/${roundNumber}`, { method: 'DELETE' });
             if (!res.ok) throw new Error((await res.json()).detail);
-            matchData = await fetch(`/api/matches/${matchId}`).then(r => r.json());
+            applyMatchState(await res.json());
             renderTeamInfo();
             renderRounds();
             resetInput();
@@ -914,7 +918,7 @@
         try {
             const res = await fetch(`/api/matches/${matchId}/rounds`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
             if (!res.ok) throw new Error((await res.json()).detail);
-            matchData = await res.json();
+            applyMatchState(await res.json());
             renderTeamInfo(); renderRounds();
             initInputPanel();
             if (matchData.status === 'FINISHED') showVictoryModal();

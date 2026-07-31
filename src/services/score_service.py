@@ -146,24 +146,18 @@ class ScoreService:
                 )
                 db.add(stats)
 
-        db.commit()
-        logger.info(f"라운드 {round_number} 통계 저장 완료 (매치 ID: {match_id})")
+        logger.info(f"라운드 {round_number} 통계 반영 준비 (매치 ID: {match_id})")
 
 
     @staticmethod
-    def update_match_total_score(match_id: int, db: Session):
+    def update_match_total_score(match: Match):
         """
         매치의 총점 계산 및 업데이트
         모든 라운드 점수를 합산
 
         Args:
-            match_id: 매치 ID
-            db: 데이터베이스 세션
+            match: 업데이트할 매치
         """
-        match = db.query(Match).filter(Match.id == match_id).first()
-        if not match:
-            return
-
         total_a = 0
         total_b = 0
 
@@ -191,5 +185,4 @@ class ScoreService:
                 match.status = "PLAYING"
                 match.winner_team = None
 
-        db.commit()
-        logger.info(f"총점 업데이트: 매치 ID {match_id}, A={total_a}, B={total_b}")
+        logger.info(f"총점 반영 준비: 매치 ID {match.id}, A={total_a}, B={total_b}")

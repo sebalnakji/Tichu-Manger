@@ -2,10 +2,11 @@
 Admin Router
 관리자 전용 API 엔드포인트
 """
+from datetime import date, datetime
 from typing import List, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, status, Header
 from sqlalchemy.orm import Session
-from sqlalchemy import extract
 from pydantic import BaseModel
 
 from core.database import get_db
@@ -189,10 +190,20 @@ def reset_data(
     try:
         deleted = {}
 
+        def date_bounds(y):
+            return date(y, 1, 1), date(y + 1, 1, 1)
+
         def delete_stats(y):
             q = db.query(MatchStats)
             if y:
-                match_ids = [m.id for m in db.query(Match.id).filter(extract('year', Match.play_date) == y).all()]
+                start_date, end_date = date_bounds(y)
+                match_ids = [
+                    m.id
+                    for m in db.query(Match.id).filter(
+                        Match.play_date >= start_date,
+                        Match.play_date < end_date,
+                    ).all()
+                ]
                 if not match_ids:
                     return 0
                 q = q.filter(MatchStats.match_id.in_(match_ids))
@@ -201,13 +212,22 @@ def reset_data(
         def delete_matches(y):
             q = db.query(Match)
             if y:
-                q = q.filter(extract('year', Match.play_date) == y)
+                start_date, end_date = date_bounds(y)
+                q = q.filter(
+                    Match.play_date >= start_date,
+                    Match.play_date < end_date,
+                )
             return q.delete(synchronize_session=False)
 
         def delete_players(y):
             q = db.query(Player)
             if y:
-                q = q.filter(extract('year', Player.created_at) == y)
+                start_date = datetime(y, 1, 1)
+                end_date = datetime(y + 1, 1, 1)
+                q = q.filter(
+                    Player.created_at >= start_date,
+                    Player.created_at < end_date,
+                )
             return q.delete(synchronize_session=False)
 
         table = req.table
