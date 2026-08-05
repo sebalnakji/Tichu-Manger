@@ -498,8 +498,10 @@ class StatsService:
         # 정렬: 승수 > 승률 > 티츄 성공률 > 라지티츄 성공률
         stats_list.sort(
             key=lambda x: (
+                -(x.total_games >= 10),
+                -x.win_rate,
+                -x.total_games,
                 -x.wins,  # 승수 내림차순
-                -x.win_rate,  # 승률 내림차순
                 -x.tichu_success_rate,  # 티츄 성공률 내림차순
                 -x.grand_success_rate,  # 라지티츄 성공률 내림차순
             )
